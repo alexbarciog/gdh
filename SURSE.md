@@ -29,6 +29,17 @@ Scrie peste folderul `dist`, fără să atingă `.git`-ul lui. Apoi, din `dist`:
 
     git add -A && git commit -m "..." && git push
 
+## Cum public pe Cloudflare
+
+Proiectul Pages `gdh` e creat prin upload direct, iar ramura lui de producție se
+numește `gbh` (o scăpare de tastare la creare). Deci publicarea se face **exact**
+cu numele ăla, altfel deploy-ul intră ca preview și adresa principală nu se
+schimbă. Din folderul `dist`:
+
+    npx wrangler pages deploy . --project-name gdh --branch gbh --commit-dirty=true
+
+Adresa: https://gdh-4ns.pages.dev
+
 ## Cum modific ceva
 
 - **texte** → `copy_gdh.py` (dicționarul `EXACT`, potrivire pe text integral)
