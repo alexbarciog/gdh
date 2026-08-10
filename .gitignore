@@ -1,0 +1,9 @@
+# dist e site-ul generat si are propriul repo (branch-ul main)
+dist/
+
+# cache de descarcare pentru fonturi si imagini aduse de la CDN
+.dlcache/
+
+__pycache__/
+*.pyc
+_*.png
