@@ -99,8 +99,8 @@ def copy_images():
         return
     n = 0
     for fn in sorted(os.listdir(src)):
-        if fn.startswith("."):
-            continue
+        if fn.startswith(".") or fn == "og-source.png":
+            continue      # sursa cartonasului de partajare, decupata separat
         shutil.copy2(os.path.join(src, fn), os.path.join(OUT, "img", fn))
         n += 1
     log("  imagini copiate: %d" % n)
@@ -116,10 +116,26 @@ def build_brand_assets():
     import assets_gdh as A
     fonts = A.load_fonts(OUT, os.path.join(CACHE, "ttf"))
     A.build_icons(OUT, fonts)
-    A.build_og(OUT, fonts,
-               C.HOME["title"],
-               "Retail distribution · Dental distribution · Shelf execution",
-               C.SITE_URL.split("//")[-1], None)
+    # Cartonasul de partajare: daca avem imaginea de brand in img_src, o
+    # folosim pe aia, decupata central la 1200x630. Altfel desenam una.
+    supplied = os.path.join(SRC, "img_src", "og-source.png")
+    if os.path.exists(supplied):
+        from PIL import Image
+        card = Image.open(supplied).convert("RGB")
+        tw, th = 1200, 630
+        scale = max(tw / card.width, th / card.height)
+        card = card.resize((round(card.width * scale), round(card.height * scale)),
+                           Image.LANCZOS)
+        left = (card.width - tw) // 2
+        top = (card.height - th) // 2
+        card.crop((left, top, left + tw, top + th)).save(
+            os.path.join(OUT, "img", "og-image.jpg"), "JPEG", quality=88, optimize=True)
+        log("  imagine de partajare: din img_src/og-source.png")
+    else:
+        A.build_og(OUT, fonts,
+                   C.HOME["title"],
+                   "Retail distribution · Dental distribution · Shelf execution",
+                   C.SITE_URL.split("//")[-1], None)
     A.build_manifest(OUT, C.SITE_NAME, "GDH")
     log("  favicon + iconite + og-image")
 
