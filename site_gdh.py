@@ -31,7 +31,6 @@ IMAGES = {
     "service-shelf-execution.html": "img/team.webp",
     "service-sell-out-visibility.html": "img/stock-check.webp",
     "service-returns.html": "img/packing.webp",
-    "brands.html": "img/fulfilment.webp",
     "insights.html": "img/planning.webp",
     "about-us.html": "img/team.webp",
     "careers.html": "img/team.webp",
@@ -263,12 +262,6 @@ def home():
         variant="ink", tight=True)
 
     import inner_gdh as I
-    cases = list(I.CASES.items())[:3]
-    brands = U.section(
-        U.head_block("Brands", "Programmes we run.",
-                     align_cta=U.link_arrow("All brands we distribute", "brands.html"))
-        + '<div class="grid grid--3">%s</div>' % "".join(
-            U.card(t, lead, fn, meta=sector) for fn, (t, sector, lead, _it) in cases))
 
     posts = newest_first(I.POSTS)[:3]
     insights = U.section(
@@ -278,7 +271,7 @@ def home():
             U.card(title, paras[0][:132].rsplit(" ", 1)[0] + "…", fn, meta="%s · %s" % (cat, date))
             for fn, (cat, date, title, paras) in posts), variant="grey")
 
-    body = (hero + topics + features + sectors + services + stats + brands
+    body = (hero + topics + features + sectors + services + stats
             + insights + contact_section()
             + cta_section(h["cta_title"], h["cta_text"]))
     return shell("index.html",
@@ -430,19 +423,6 @@ def build_all(out, pages_data):
         current = "distribution" if entry["slug"].startswith(("distribution", "service-")) \
             else "sectors"
         put(entry["slug"] + ".html", data_page(entry, current))
-
-    # --- programele de client
-    case_cards = [U.card(t, lead, fn, meta=sector)
-                  for fn, (t, sector, lead, _i) in I.CASES.items()]
-    put("brands.html", listing(
-        "brands.html", "Programmes", "How a GDH programme works.",
-        "The shapes a distribution programme takes, by channel — what we take on, what "
-        "changes, and what the brand is left to do.", case_cards, "brands",
-        "The shapes they take."))
-    for fn, (title, sector, lead, items) in I.CASES.items():
-        put(fn, article(fn, sector, title, lead, items,
-                        ("All brands", "brands.html"),
-                        ("Brands", "brands.html"), "brands"))
 
     # --- articole
     post_cards = [U.card(title, paras[0][:132].rsplit(" ", 1)[0] + "…", fn,

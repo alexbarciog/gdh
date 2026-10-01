@@ -27,10 +27,6 @@ NAV = [
             ("Practices & Clinics", "sector-dental-practices.html"),
             ("Laboratories", "sector-dental-laboratories.html"),
         ]),
-        dict(title="Proof", links=[
-            ("How programmes work", "brands.html"),
-            ("Insights", "insights.html"),
-        ]),
         dict(title="Start here", links=[
             ("Partner with us", "partner-with-us.html"),
             ("Contact sales", "contact.html"),
@@ -55,7 +51,6 @@ NAV = [
             ("Contact sales", "contact.html"),
         ]),
     ]),
-    dict(key="brands", title="Programmes", href="brands.html"),
     dict(key="insights", title="Insights", href="insights.html"),
     dict(key="about", title="About us", href="about-us.html"),
 ]
@@ -86,7 +81,6 @@ FOOTER_NAV = [
     ]),
     dict(title="Company", links=[
         ("About us", "about-us.html"),
-        ("How programmes work", "brands.html"),
         ("Insights", "insights.html"),
         ("Careers", "careers.html"),
         ("News", "news.html"),
@@ -323,10 +317,20 @@ CONTACT = dict(
 RENAMED = {
     # rescrierea din octombrie: sectiuni intregi si-au schimbat numele
     "service.html": "distribution.html",
-    "case-study.html": "brands.html",
+    "case-study.html": "sectors.html",
     "blog.html": "insights.html",
     "service-dental-distribution.html": "sector-dental.html",
     "service-retail-chain-listings.html": "service-chain-listings.html",
+    # sectiunea de programe a fost scoasa; adresele ei duc la sectoare
+    "brands.html": "sectors.html",
+    "case-national-grocery-listing.html": "sectors.html",
+    "case-drugstore-chain-rollout.html": "sectors.html",
+    "case-dental-consumables-rollout.html": "sectors.html",
+    "case-dental-equipment-distribution.html": "sectors.html",
+    "case-convenience-chains.html": "sectors.html",
+    "case-private-label.html": "sectors.html",
+    "case-seasonal-promotion.html": "sectors.html",
+    "case-market-entry.html": "sectors.html",
 }
 
 
