@@ -10,7 +10,7 @@ SITE_NAME = "GDH — Global Distribution Holdings"
 SITE_URL = "https://gdh-group.com"
 EMAIL = "office@gdh-group.com"
 PHONE = "+40 21 300 40 50"
-ADDRESS = ["Str. Depozitelor 24", "Hala D2, Sector 2", "București, România"]
+ADDRESS = ["Calea Lugojului nr 148", "CTPark", "307200 Ghiroda, România"]
 
 # --------------------------------------------------------------- navigatie
 NAV = [
@@ -266,7 +266,7 @@ CHANGELOG = dict(
     lede="New channels, new coverage, new capability.",
     sections=[
         ("August 2026 — Cold chain extended",
-         "Chilled storage extended at the București D2 hub, opening the chilled and "
+         "Chilled storage extended at the Ghiroda hub, opening the chilled and "
          "short-shelf-life categories to the brands we carry."),
         ("June 2026 — Two new regional hubs",
          "Hubs opened in Cluj and Constanța, bringing daily store coverage to two further "

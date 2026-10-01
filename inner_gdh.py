@@ -149,7 +149,7 @@ PAGES = {
         lead="What changed in the GDH distribution network — new chains, new channels, new coverage.",
         body=P(
             ("August 2026 — Cold chain at hub D2",
-             "Chilled storage extended by 1.400 pallet positions at the București D2 hub, opening the "
+             "Chilled storage extended at the Ghiroda hub, opening the "
              "chilled and short-shelf-life categories to the brands we carry."),
             ("June 2026 — Two new regional hubs",
              "Hubs opened in Cluj and Constanța, bringing daily store coverage to two further regions "

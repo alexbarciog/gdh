@@ -225,8 +225,8 @@ def json_ld(page):
         "description": C.TITLES["index.html"][1],
         "address": {
             "@type": "PostalAddress",
-            "streetAddress": "Str. Depozitelor 24, Hala D2",
-            "addressLocality": "București",
+            "streetAddress": "Calea Lugojului nr 148, CTPark",
+            "addressLocality": "Ghiroda",
             "addressCountry": "RO",
         },
         "contactPoint": [{

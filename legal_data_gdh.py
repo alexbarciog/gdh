@@ -76,16 +76,16 @@ PAGES = [   {   'slug': 'contact-sales',
                             'list line by line, ask what you can produce and what you have '
                             'already promised elsewhere, and tell you which doors we think are '
                             "open. Bring samples if you have them; a buyer's reaction to a pack "
-                            'is hard to predict from a photograph. It can happen at our '
-                            'București hub, at your factory, or on a call — and if you come to '
-                            'us, you are welcome to walk the warehouse while you are here.'),
+                            'is hard to predict from a photograph. It can happen at our Ghiroda '
+                            'hub, at your factory, or on a call — and if you come to us, you are '
+                            'welcome to walk the warehouse while you are here.'),
                         (   'How to reach the commercial desk',
                             'Write to office@gdh-group.com with your brand name in the subject '
                             'line, or call +40 21 300 40 50 and ask for the commercial desk. '
-                            'Post reaches us at Str. Depozitelor 24, Hala D2, Sector 2, '
-                            'București. The contact form on this site simply opens a message in '
-                            'your own email client with the fields filled in — nothing is sent '
-                            'to a server here and nothing is stored — so if you want to attach a '
+                            'Post reaches us at Calea Lugojului nr 148, CTPark, 307200 Ghiroda. '
+                            'The contact form on this site simply opens a message in your own '
+                            'email client with the fields filled in — nothing is sent to a '
+                            'server here and nothing is stored — so if you want to attach a '
                             'product list, it is quicker to email us directly.')],
         'needsReview': False},
     {   'slug': 'news',
@@ -134,9 +134,9 @@ PAGES = [   {   'slug': 'contact-sales',
                             'what you are working on and your deadline. Press enquiries are '
                             'handled by one person alongside their other work, so we cannot '
                             'promise a same-day answer — but you will get a reply, including '
-                            'when the reply is that we cannot help. Post reaches us at Str. '
-                            'Depozitelor 24, Hala D2, Sector 2, București. Press contact: [Name '
-                            'and title of press contact].'),
+                            'when the reply is that we cannot help. Post reaches us at Calea '
+                            'Lugojului nr 148, CTPark, 307200 Ghiroda. Press contact: [Name and '
+                            'title of press contact].'),
                         (   'What we will and will not comment on',
                             'We will talk about our own operation: what we distribute, how the '
                             'network is laid out, and how we work with the brands we carry and '
@@ -182,9 +182,9 @@ PAGES = [   {   'slug': 'contact-sales',
                             'detail on that one point.'),
                         (   'Who is responsible for your data',
                             'The controller is [Registered company name], trading as GDH — '
-                            'Global Distribution Holdings, with its registered office at Str. '
-                            'Depozitelor 24, Hala D2, Sector 2, București, Romania. Registered '
-                            'in Romania under [company registration number]; VAT number [VAT '
+                            'Global Distribution Holdings, with its registered office at Calea '
+                            'Lugojului nr 148, CTPark, 307200 Ghiroda, Romania. Registered in '
+                            'Romania under [company registration number]; VAT number [VAT '
                             'number]. For anything in this notice, write to office@gdh-group.com '
                             'or ring +40 21 300 40 50 and ask for [name or role of the data '
                             'protection contact]. Where you see square brackets, the detail '
@@ -257,15 +257,15 @@ PAGES = [   {   'slug': 'contact-sales',
                             'This website, gdh-group.com, is operated by GDH — Global '
                             'Distribution Holdings, a company registered in Romania and trading '
                             'as a distributor of retail and dental products. Registered office: '
-                            'Str. Depozitelor 24, Hala D2, Sector 2, București, Romania. Legal '
+                            'Calea Lugojului nr 148, CTPark, 307200 Ghiroda, Romania. Legal '
                             'form: [Legal form of the company]. Full registered name as entered '
                             'in the trade register: [Full registered company name]. Where these '
                             'pages use the short name GDH, they mean that company and no other.'),
                         (   'How to reach us',
                             'Email: office@gdh-group.com. Telephone: +40 21 300 40 50. Post: '
-                            'Str. Depozitelor 24, Hala D2, Sector 2, București, Romania. Email '
-                            'and telephone are the fastest routes, and both reach the same team. '
-                            'The contact form on this site is not a form in the usual sense — it '
+                            'Calea Lugojului nr 148, CTPark, 307200 Ghiroda, Romania. Email and '
+                            'telephone are the fastest routes, and both reach the same team. The '
+                            'contact form on this site is not a form in the usual sense — it '
                             'opens a message in your own email program, already addressed to us, '
                             'which you then send yourself. Nothing you type into it reaches us '
                             'until you press send in your own email client.'),
@@ -401,12 +401,12 @@ PAGES = [   {   'slug': 'contact-sales',
                             'Failing that, it goes to the competent court in [Judicial district '
                             'of the competent court], Romania. If one clause turns out to be '
                             'unenforceable, the rest stands. Our details: GDH — Global '
-                            'Distribution Holdings, Str. Depozitelor 24, Hala D2, Sector 2, '
-                            'București, Romania. Company registration number [Company '
-                            'registration number]. VAT number [VAT number]. Represented by [Name '
-                            'of managing director]. For a question about these terms, or a copy '
-                            'of the current supply agreement, write to office@gdh-group.com or '
-                            'call +40 21 300 40 50.')],
+                            'Distribution Holdings, Calea Lugojului nr 148, CTPark, 307200 '
+                            'Ghiroda, Romania. Company registration number [Company registration '
+                            'number]. VAT number [VAT number]. Represented by [Name of managing '
+                            'director]. For a question about these terms, or a copy of the '
+                            'current supply agreement, write to office@gdh-group.com or call +40 '
+                            '21 300 40 50.')],
         'needsReview': True},
     {   'slug': 'cookies',
         'kicker': 'Cookies',
@@ -484,8 +484,8 @@ PAGES = [   {   'slug': 'contact-sales',
                             'you have a question about it, or you think the site is doing '
                             'something this page does not describe, we would genuinely like to '
                             'know. Write to office@gdh-group.com or call +40 21 300 40 50. Our '
-                            'registered address is Str. Depozitelor 24, Hala D2, Sector 2, '
-                            'București, Romania.')],
+                            'registered address is Calea Lugojului nr 148, CTPark, 307200 '
+                            'Ghiroda, Romania.')],
         'needsReview': True},
     {   'slug': 'whistleblowing',
         'kicker': 'Whistleblowing',
@@ -518,7 +518,7 @@ PAGES = [   {   'slug': 'contact-sales',
                             'whistleblowing email address], which is read only by [role or name '
                             'of the person responsible for receiving reports]. By post, in a '
                             'sealed envelope marked "Whistleblowing — confidential", to GDH, '
-                            'Str. Depozitelor 24, Hala D2, Sector 2, București. Tell us what '
+                            'Calea Lugojului nr 148, CTPark, 307200 Ghiroda. Tell us what '
                             'happened, where and when, who was involved, and attach anything '
                             'that helps. If you would rather explain it in person, say so and we '
                             'will arrange a meeting.'),

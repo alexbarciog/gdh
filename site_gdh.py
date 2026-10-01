@@ -92,8 +92,10 @@ def org_jsonld():
                         "and place products into the country's largest store chains and "
                         "dental practices."),
         "address": {"@type": "PostalAddress",
-                    "streetAddress": C.ADDRESS[0],
-                    "addressLocality": "București",
+                    "streetAddress": "%s, %s" % (C.ADDRESS[0], C.ADDRESS[1]),
+                    "postalCode": "307200",
+                    "addressLocality": "Ghiroda",
+                    "addressRegion": "Timiș",
                     "addressCountry": "RO"},
         "contactPoint": [{"@type": "ContactPoint",
                           "telephone": C.PHONE.replace(" ", ""),
