@@ -238,6 +238,15 @@ def build_css():
   .navbar .navlink{width:100%}
 }
 .faq-answer{overflow:hidden;transition:height .35s cubic-bezier(.22,.61,.36,1)}
+/* fundalul rosu urca la hover si cat timp cardul e deschis: negrul intrebarii si
+   griul raspunsului nu se citesc pe el, deci amandoua trec pe alb */
+.faq-card .faq-top>div,.faq-card .faq-bottom p,.faq-card .faq-icon{
+  transition:color .3s ease}
+.faq-card .faq-top>div{color:var(--gdh-ink)}
+.faq-card .faq-bottom p{color:#505050}
+.faq-card:hover .faq-top>div,.faq-card.is-open .faq-top>div,
+.faq-card:hover .faq-bottom p,.faq-card.is-open .faq-bottom p,
+.faq-card:hover .faq-icon,.faq-card.is-open .faq-icon{color:#fff}
 .gdh-slider{position:relative}
 .gdh-slider .g-slider-mask{overflow:hidden}
 .gdh-slider-track{display:flex;transition:transform .55s cubic-bezier(.22,.61,.36,1);will-change:transform}

@@ -293,9 +293,13 @@ def body_rewrite(doc, logo_nav, logo_footer, logo_nav_ink=None):
         i = idx[0]
         idx[0] += 1
         ans = FAQ_ANSWERS[i] if i < len(FAQ_ANSWERS) else FAQ_ANSWERS[-1]
-        return m.group(1) + esc(ans) + m.group(3)
+        # fara culoarea din atribut: pe fundalul rosu textul trebuie sa treaca
+        # pe alb, iar un style inline ar bate orice regula din CSS
+        return '<p class="paragraph-regular">' + esc(ans) + m.group(3)
 
     doc = re.sub(r'(<p class="paragraph-regular" style="color: rgb\(80, 80, 80\);">)(.*?)(</p>)', faq, doc, flags=re.S)
+    doc = doc.replace('<div class="faq-top"><div class="font-1-normal" style="color: black;">',
+                      '<div class="faq-top"><div class="font-1-normal">')
 
     # formulare: fara actiune externa, trimise prin mailto de site.js
     doc = re.sub(r'<form([^>]*)>', lambda m: '<form%s>' % re.sub(
@@ -321,6 +325,10 @@ def body_rewrite(doc, logo_nav, logo_footer, logo_nav_ink=None):
     import inner_gdh as I
     for was, now in I.RENAME.items():
         doc = doc.replace('href="%s"' % was, 'href="%s"' % now)
+
+    # portretele de stoc din antet (trei figuri cu ochelari de soare, pe fundal
+    # rosu) nu au nicio legatura cu distributia si par oameni ai firmei
+    doc = re.sub(r'<div class="home-hero-img-wrap">.*?</div>', "", doc, flags=re.S)
 
     doc = rewrite_pricing(doc)
     doc = rewrite_cards(doc)
