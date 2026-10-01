@@ -1,0 +1,15 @@
+# Cloudflare Pages — proiectul „gdh".
+#
+# Site static, fara pas de build pe Cloudflare: build_site.py produce ./dist
+# local, iar wrangler urca folderul gata facut.
+#
+#   python3 build_site.py
+#   npx wrangler pages deploy --branch gbh
+#
+# Ramura de productie a proiectului se numeste `gbh` (greseala de tastare la
+# creare, pastrata ca sa nu se schimbe adresa). Fara `--branch gbh` deploy-ul
+# intra ca previzualizare si gdh-group.com ramane pe versiunea veche.
+
+name = "gdh"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-10-02"
