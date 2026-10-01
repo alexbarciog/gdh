@@ -53,6 +53,17 @@ def topbar(links):
             '<div class="topbar"><div class="wrap">%s</div></div>' % items)
 
 
+def chrome(links, nav, logo_src, current=""):
+    """Banda de gradient, bara utilitara si antetul, intr-o singura piesa fixa.
+
+    Daca bara utilitara ramane in curgerea normala a paginii, ea pleaca la
+    derulare si antetul se lipeste singur de marginea de sus — exact saritura
+    care arata gresit. Asa se misca toate trei la fel: adica deloc.
+    """
+    return ('<div class="chrome" id="gdh-chrome">%s%s</div>'
+            % (topbar(links), header(nav, logo_src, current)))
+
+
 def _mega(group):
     cols = []
     for col in group["columns"]:

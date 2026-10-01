@@ -195,7 +195,33 @@
     });
   }
 
+  /* ------------------------------------------------------------- antet */
+  function initChrome() {
+    var chrome = document.getElementById("gdh-chrome");
+    if (!chrome) return;
+
+    function measure() {
+      // sertarul de telefon porneste exact sub antet, oricat ar fi de inalt
+      document.documentElement.style.setProperty(
+        "--chrome-h", chrome.getBoundingClientRect().height + "px");
+    }
+    var ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(function () {
+        chrome.classList.toggle("is-scrolled", window.scrollY > 24);
+        ticking = false;
+      });
+    }
+    measure();
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", measure);
+  }
+
   function boot() {
+    initChrome();
     initMega();
     initDrawer();
     initAccordion();

@@ -145,8 +145,7 @@ def shell(page, title, desc, body, current="", noindex=False, jsonld=""):
         '<main id="main" tabindex="-1">%s</main>'
         '%s<script src="js/site.js" defer></script></body></html>'
         % (head(page, title, desc, noindex), jsonld,
-           U.topbar(C.TOPBAR),
-           U.header(C.NAV, LOGO_DARK, current),
+           U.chrome(C.TOPBAR, C.NAV, LOGO_DARK, current), "",
            U.drawer(C.NAV),
            body,
            U.footer(C.FOOTER_NAV, LOGO_LIGHT, C.LEGAL)))

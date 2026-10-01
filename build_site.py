@@ -147,6 +147,11 @@ def fingerprint():
             stem, ext = os.path.splitext(name)
             new = "%s.%s%s" % (stem, digest, ext)
             os.rename(src, os.path.join(OUT, sub, new))
+            # Lasam si o copie cu numele neamprentat. Paginile proaspete trimit
+            # la fisierul cu amprenta; copia asta prinde doar documentele vechi
+            # ramase deschise intr-o fila, ca sa nu se randeze fara stil cand
+            # fisierul cu numele vechi dispare la urmatorul build.
+            shutil.copy2(os.path.join(OUT, sub, new), os.path.join(OUT, sub, name))
             renames["%s/%s" % (sub, name)] = "%s/%s" % (sub, new)
     for fn in os.listdir(OUT):
         if not fn.endswith(".html"):
