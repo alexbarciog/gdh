@@ -136,32 +136,57 @@ def load_pages_data():
 
 # --------------------------------------------------------------------- 6
 def fingerprint():
-    """Amprenta continutului in numele css/js, ca sa nu ramana cache vechi."""
+    """Amprenta continutului in numele fisierelor statice.
+
+    `_headers` le tine un an, ca `immutable`. Daca numele nu se schimba, o
+    imagine inlocuita nu mai ajunge niciodata la cine a vazut-o o data — nici
+    prin browser, nici prin reteaua Cloudflare. Sigla noua a stat asa doua
+    publicari la rand. Cu numele legat de continut, un fisier schimbat capata
+    alta adresa si problema nu mai poate aparea.
+
+    favicon.ico ramane la radacina cu numele lui: browserele il cer pe
+    conventie, fara sa se uite in HTML.
+    """
     renames = {}
-    for sub in ("css", "js"):
-        for name in sorted(os.listdir(os.path.join(OUT, sub))):
-            src = os.path.join(OUT, sub, name)
-            if not os.path.isfile(src):
-                continue
-            digest = hashlib.md5(open(src, "rb").read()).hexdigest()[:8]
-            stem, ext = os.path.splitext(name)
-            new = "%s.%s%s" % (stem, digest, ext)
-            os.rename(src, os.path.join(OUT, sub, new))
-            # Lasam si o copie cu numele neamprentat. Paginile proaspete trimit
-            # la fisierul cu amprenta; copia asta prinde doar documentele vechi
-            # ramase deschise intr-o fila, ca sa nu se randeze fara stil cand
-            # fisierul cu numele vechi dispare la urmatorul build.
+
+    def stamp(sub, name):
+        src = os.path.join(OUT, sub, name)
+        if not os.path.isfile(src):
+            return
+        digest = hashlib.md5(open(src, "rb").read()).hexdigest()[:8]
+        stem, ext = os.path.splitext(name)
+        new = "%s.%s%s" % (stem, digest, ext)
+        os.rename(src, os.path.join(OUT, sub, new))
+        renames["%s/%s" % (sub, name)] = "%s/%s" % (sub, new)
+        if sub in ("css", "js"):
+            # copie cu numele vechi, pentru o fila ramasa deschisa pe un build
+            # anterior; paginile proaspete trimit la numele cu amprenta
             shutil.copy2(os.path.join(OUT, sub, new), os.path.join(OUT, sub, name))
-            renames["%s/%s" % (sub, name)] = "%s/%s" % (sub, new)
-    for fn in os.listdir(OUT):
-        if not fn.endswith(".html"):
+
+    for sub in ("css", "js", "img"):
+        for name in sorted(os.listdir(os.path.join(OUT, sub))):
+            stamp(sub, name)
+
+    # rescriem referintele peste tot: HTML, CSS, manifest, sitemap. Formele
+    # relative (img/x.png) si absolute (https://.../img/x.png) contin amandoua
+    # sirul "img/x.png", deci o singura inlocuire le prinde pe amandoua.
+    targets = []
+    for root, _dirs, files in os.walk(OUT):
+        if os.sep + ".git" in root:
             continue
-        fp = os.path.join(OUT, fn)
-        doc = open(fp, encoding="utf-8").read()
-        for old, new in renames.items():
-            doc = doc.replace(old, new)
-        open(fp, "w", encoding="utf-8").write(doc)
-    log("  amprenta pe %d fisiere" % len(renames))
+        for fn in files:
+            if fn.endswith((".html", ".css", ".xml", ".webmanifest", ".txt", ".json")):
+                targets.append(os.path.join(root, fn))
+
+    ordered = sorted(renames.items(), key=lambda kv: len(kv[0]), reverse=True)
+    for path in targets:
+        text = open(path, encoding="utf-8").read()
+        before = text
+        for old_ref, new_ref in ordered:
+            text = text.replace(old_ref, new_ref)
+        if text != before:
+            open(path, "w", encoding="utf-8").write(text)
+    log("  amprenta pe %d fisiere (css/js/img)" % len(renames))
 
 
 if __name__ == "__main__":

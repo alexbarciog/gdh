@@ -212,8 +212,8 @@ ul,ol{padding:0;list-style:none}
 
 /* Banda de gradient din capul paginii si de deasupra blocurilor: e imaginea
    de gradient primita in pachetul de resurse, exact ca in limbajul-sursa. */
-.hairline{height:6px;background:url(../img/gradient.webp) center/cover no-repeat}
-.topline{height:4px;background:url(../img/gradient.webp) center/cover no-repeat}
+.hairline{height:6px;background:url(../img/gradient.667191c5.webp) center/cover no-repeat}
+.topline{height:4px;background:url(../img/gradient.667191c5.webp) center/cover no-repeat}
 .topline--tall{height:8px}
 
 /* ============================================================ header */
@@ -321,7 +321,7 @@ html.nav-open{overflow:hidden}
 .card{display:flex;flex-direction:column;background:#fff;height:100%;position:relative;
   border:1px solid var(--g100);transition:border-color .2s,transform .2s}
 .card::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;
-  background:url(../img/gradient.webp) center/cover no-repeat;opacity:0;
+  background:url(../img/gradient.667191c5.webp) center/cover no-repeat;opacity:0;
   transition:opacity .25s;z-index:1}
 a.card:hover::before{opacity:1}
 a.card:hover{border-color:var(--accent);transform:translateY(-3px)}
@@ -352,7 +352,7 @@ a.tile:hover{border-left-color:var(--accent);background:#fff;
 /* ============================================================ figures */
 .stat{padding-top:var(--s-2);position:relative}
 .stat::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;
-  background:url(../img/gradient.webp) center/cover no-repeat}
+  background:url(../img/gradient.667191c5.webp) center/cover no-repeat}
 .stat__value{font-size:clamp(2.2rem,3.6vw,3rem);font-weight:700;line-height:1.1;
   letter-spacing:normal}
 .stat__label{color:var(--g700);font-size:var(--t-small);margin-top:8px}
