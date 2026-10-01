@@ -452,7 +452,7 @@ PAGES = [   {   'slug': 'sectors',
                             'whether the channel expects a price-marked pack — and you decide. '
                             'Nothing is mandatory.'}]},
     {   'slug': 'sector-private-label',
-        'kicker': 'Private Label',
+        'kicker': 'Private label',
         'title': "Private label: from a chain's brief to a filled shelf",
         'lede': 'Chains ask us for own-brand lines they can build a range around. We match the '
                 'brief to a producer, agree the specification, and buy the run ourselves — so '
@@ -633,7 +633,7 @@ PAGES = [   {   'slug': 'sectors',
                             'margin between what we pay you and what the channel pays us, which '
                             'only works if your range keeps reordering.'}]},
     {   'slug': 'sector-dental-practices',
-        'kicker': 'Practices & Clinics',
+        'kicker': 'Practices & clinics',
         'title': 'Getting your range into dental practices and clinics',
         'lede': 'Practices order small, order often, and order to a clinical specification. We '
                 'hold your range in stock, call on practices, clinics and laboratories every '
@@ -898,7 +898,7 @@ PAGES = [   {   'slug': 'sectors',
                             "are handled by us under each account's terms. You are never asked "
                             'to buy stock back unless that was agreed in advance.'}]},
     {   'slug': 'service-chain-listings',
-        'kicker': 'Chain Listings',
+        'kicker': 'Chain listings',
         'title': 'Getting your range listed in the major chains',
         'lede': 'Chains open their categories on a fixed calendar. We prepare the submission, '
                 'take the buyer meeting, agree the terms and **buy the opening order ourselves** '
@@ -988,7 +988,7 @@ PAGES = [   {   'slug': 'sectors',
                             'another chain, independent retailers or pharmacy, where the gap may '
                             'be real.'}]},
     {   'slug': 'service-stock-and-delivery',
-        'kicker': 'Stock & Delivery',
+        'kicker': 'Stock & delivery',
         'title': 'We buy the stock and run every route to the shelf',
         'lede': 'Your product arrives once, at our goods-in bay. After that it is **our stock**, '
                 'in our warehouses, on our routes — into chain depots, store back doors, '
@@ -1080,7 +1080,7 @@ PAGES = [   {   'slug': 'sectors',
                             'windows, labelling standards and delivery paperwork are our job, '
                             'not yours.'}]},
     {   'slug': 'service-shelf-execution',
-        'kicker': 'Shelf Execution',
+        'kicker': 'Shelf execution',
         'title': 'Your product, put on the shelf properly',
         'lede': 'Delivery is only half the job. Our field teams walk the stores we sell into, '
                 'put your stock where it belongs, rebuild what the week has pulled apart, and '
@@ -1164,7 +1164,7 @@ PAGES = [   {   'slug': 'sectors',
                             'we tell you what we did instead. What we will not do is promise a '
                             'build the fixture cannot take.'}]},
     {   'slug': 'service-sell-out-visibility',
-        'kicker': 'Sell-Out Visibility',
+        'kicker': 'Sell-out visibility',
         'title': 'See what actually sold, store by store',
         'lede': 'Sell-in tells you what we bought. Sell-out tells you what shoppers and '
                 'practices actually took off the shelf. You get **both**, per chain and per SKU, '
@@ -1244,7 +1244,7 @@ PAGES = [   {   'slug': 'sectors',
                             'the mapping to you. Most brands take a weekly export and a monthly '
                             'review on top of it.'}]},
     {   'slug': 'service-returns',
-        'kicker': 'Returns & Recalls',
+        'kicker': 'Returns & recalls',
         'title': 'Returns and recalls, handled on the way back',
         'lede': 'Every store we deliver to is a store we collect from. Returns ride back on the '
                 'same van, get triaged at our hub, and reach you as **one clean credit line** — '
@@ -1305,7 +1305,7 @@ PAGES = [   {   'slug': 'sectors',
                        {   'title': 'Evidence, then write-off',
                            'text': 'Damage and date expiry are photographed, counted and coded '
                                    'against the store that sent them back before anything is '
-                                   'written out of your stock position.'}],
+                                   'written out of our stock position.'}],
         'faq': [   {   'q': 'What does returns handling cost our brand?',
                        'a': 'Nothing. We buy your stock, so returns from the stores are ours to '
                             'manage, not a service we bill you for. There is no collection '

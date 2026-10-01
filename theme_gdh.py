@@ -139,7 +139,8 @@ ul,ol{{padding:0;list-style:none}}
 .prose{{max-width:68ch}}
 .prose p + p{{margin-top:var(--s-3)}}
 .muted{{color:var(--g700)}}
-.section--ink .muted,.section--ink .lede{{color:rgba(255,255,255,.72)}}
+.section--ink .muted,.section--ink .lede,
+.section--ink .stat__label{{color:rgba(255,255,255,.72)}}
 
 /* ============================================================ buttons */
 .btn{{display:inline-flex;align-items:center;gap:12px;border:2px solid transparent;
@@ -204,10 +205,10 @@ ul,ol{{padding:0;list-style:none}}
   border-top:1px solid var(--g100);box-shadow:0 24px 48px rgba(0,0,0,.09);
   display:none}}
 .mega.is-open{{display:block}}
-.mega__inner{{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-5);
-  padding-block:var(--s-5)}}
+.mega__inner{{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:var(--s-5);padding-block:var(--s-5)}}
 .mega__col h3{{font-size:.78rem;font-weight:700;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--g400);margin-bottom:var(--s-2)}}
+  text-transform:uppercase;color:var(--g700);margin-bottom:var(--s-2)}}
 .mega__col li + li{{margin-top:10px}}
 .mega__col a{{font-size:1rem;font-weight:500}}
 .mega__col a:hover{{color:var(--accent)}}
@@ -287,7 +288,7 @@ a.card:hover{{border-color:var(--accent);transform:translateY(-3px)}}
 a.card:hover .card__media img{{transform:scale(1.04)}}
 .card__body{{padding:var(--s-3);display:flex;flex-direction:column;gap:10px;flex:1}}
 .card__meta{{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--g400);font-weight:700}}
+  color:var(--g700);font-weight:700}}
 .card__foot{{margin-top:auto;padding-top:var(--s-2)}}
 
 /* fise de subiect, fara imagine */
@@ -352,7 +353,7 @@ a.tile:hover{{border-left-color:var(--accent);background:#fff;
   text-transform:uppercase;margin-bottom:8px}}
 .field input,.field textarea,.field select{{width:100%;padding:14px 16px;
   border:1px solid var(--g200);background:#fff;font:inherit;font-size:1rem}}
-.field input:focus,.field textarea:focus{{border-color:var(--accent);outline:none}}
+.field input:focus-visible,.field textarea:focus-visible{{border-color:var(--accent)}}
 .field textarea{{min-height:150px;resize:vertical}}
 
 /* ============================================================ footer */
@@ -373,8 +374,11 @@ a.tile:hover{{border-left-color:var(--accent);background:#fff;
 @media (max-width:560px){{.footer__main{{grid-template-columns:1fr}}}}
 
 /* ============================================================ motion */
-[data-reveal]{{opacity:0;transform:translateY(18px)}}
-[data-reveal].is-in{{opacity:1;transform:none;
+/* Ascunderea se aplica doar daca scriptul a pornit si a pus clasa `js` pe
+   <html>. Altfel continutul e vizibil din start: inainte, orice eroare de
+   JavaScript lasa toata pagina de sub antet invizibila, fara nicio scapare. */
+html.js [data-reveal]{{opacity:0;transform:translateY(18px)}}
+html.js [data-reveal].is-in{{opacity:1;transform:none;
   transition:opacity .7s ease,transform .7s cubic-bezier(.22,.61,.36,1)}}
 @media (prefers-reduced-motion:reduce){{
   *,*::before,*::after{{animation-duration:.01ms!important;transition-duration:.01ms!important}}

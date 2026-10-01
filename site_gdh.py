@@ -45,7 +45,7 @@ def img(slot):
 
 
 # --------------------------------------------------------------------- shell
-def head(page, title, desc, noindex=False):
+def head(page, title, desc, noindex=False, og_type="website"):
     url = C.SITE_URL + ("/" if page == "index.html" else "/" + page[:-len(".html")])
     og = C.SITE_URL + "/img/og-image.jpg"
     e = U.esc
@@ -62,7 +62,7 @@ def head(page, title, desc, noindex=False):
         '<link rel="manifest" href="/site.webmanifest">'
         '<meta name="theme-color" content="#00767a">'
         '<meta name="color-scheme" content="light">'
-        '<meta property="og:type" content="website">'
+        '<meta property="og:type" content="%s">'
         '<meta property="og:site_name" content="%s">'
         '<meta property="og:locale" content="en_GB">'
         '<meta property="og:url" content="%s">'
@@ -77,7 +77,7 @@ def head(page, title, desc, noindex=False):
         '<meta name="twitter:image" content="%s">'
         % (e(title), e(desc),
            '<meta name="robots" content="noindex">' if noindex else "",
-           e(url), e(C.SITE_NAME), e(url), e(title), e(desc), e(og),
+           e(url), e(og_type), e(C.SITE_NAME), e(url), e(title), e(desc), e(og),
            e(title), e(desc), e(og)))
 
 
@@ -114,6 +114,22 @@ def clip(text, limit=42):
     return text[:limit].rsplit(" ", 1)[0].rstrip(" ,.;:") + "…"
 
 
+def newest_first(posts):
+    """Articolele, de la cel mai nou. Dictionarul nu era in ordinea datelor."""
+    months = ("January February March April May June July August September "
+              "October November December").split()
+
+    def key(item):
+        date = item[1][1]
+        parts = date.replace(",", "").split()
+        try:
+            return (int(parts[2]), months.index(parts[1]) + 1, int(parts[0]))
+        except (IndexError, ValueError):
+            return (0, 0, 0)
+
+    return sorted(posts.items(), key=key, reverse=True)
+
+
 def page_title(headline):
     """Titlul din tab. Sufixul de brand intra doar daca nu impinge peste 62 de
     caractere — altfel Google il taie oricum si pierdem finalul titlului."""
@@ -125,18 +141,20 @@ def page_title(headline):
 def meta_desc(lede, sections=(), floor=70):
     """Descrierea de cautare. Daca lede-ul e prea scurt, imprumutam din prima
     sectiune pana trecem de pragul util."""
-    text = lede.strip()
+    # ** e marcaj de ingrosare pentru pagina, nu text: nu are ce cauta in
+    # description, og:description sau twitter:description
+    text = lede.replace("**", "").strip()
     for item in sections:
         if len(text) >= floor:
             break
         body = item[1] if isinstance(item, (tuple, list)) else item.get("body", "")
-        text = (text + " " + body.strip()).strip()
+        text = (text + " " + body.replace("**", "").strip()).strip()
     if len(text) > 180:
         text = text[:177].rsplit(" ", 1)[0] + "…"
     return text
 
 
-def shell(page, title, desc, body, current="", noindex=False, jsonld=""):
+def shell(page, title, desc, body, current="", noindex=False, jsonld="", og_type="website"):
     return (
         '<!DOCTYPE html><html lang="en"><head>%s'
         '<link rel="stylesheet" href="css/site.css">%s</head><body>'
@@ -144,7 +162,7 @@ def shell(page, title, desc, body, current="", noindex=False, jsonld=""):
         '%s%s%s'
         '<main id="main" tabindex="-1">%s</main>'
         '%s<script src="js/site.js" defer></script></body></html>'
-        % (head(page, title, desc, noindex), jsonld,
+        % (head(page, title, desc, noindex, og_type), jsonld,
            U.chrome(C.TOPBAR, C.NAV, LOGO_DARK, current), "",
            U.drawer(C.NAV),
            body,
@@ -241,9 +259,8 @@ def home():
         ]), variant="grey")
 
     stats = U.section(
-        U.head_block("The network", h["stats_title"]) + U.stats(C.STATS)
-        + '<p class="muted" style="margin-top:28px;font-size:.95rem">%s</p>'
-        % U.esc(h["stats_note"]), variant="ink", tight=True)
+        U.head_block("The network", h["stats_title"]) + U.stats(C.STATS),
+        variant="ink", tight=True)
 
     import inner_gdh as I
     cases = list(I.CASES.items())[:3]
@@ -253,7 +270,7 @@ def home():
         + '<div class="grid grid--3">%s</div>' % "".join(
             U.card(t, lead, fn, meta=sector) for fn, (t, sector, lead, _it) in cases))
 
-    posts = list(I.POSTS.items())[:3]
+    posts = newest_first(I.POSTS)[:3]
     insights = U.section(
         U.head_block("Insights", "From the commercial desk.",
                      align_cta=U.link_arrow("All insights", "insights.html"))
@@ -316,14 +333,15 @@ def article(page, kicker, title, lede, blocks, back, trail_parent, current):
             + cta_section("Send us your range.",
                           "Tell us what you make and which shelves it belongs on."))
     return shell(page, page_title(title), meta_desc(lede, [("", b) for _h, b in blocks]),
-                 body, current)
+                 body, current, og_type="article")
 
 
 # ------------------------------------------------------------- contact page
 def contact_page():
     c = C.CONTACT
     form = (
-        '<form data-gdh-form="1" data-subject="Distribution enquiry">'
+        '<form data-gdh-form="1" data-subject="Distribution enquiry" '
+        'method="post" action="contact.html">'
         '<div class="grid grid--2">'
         '<label class="field"><span>Name</span><input name="Name" required></label>'
         '<label class="field"><span>Company</span><input name="Company" required></label>'
@@ -376,7 +394,7 @@ def style_guide():
                        "Colour, type and the components this site is built from.")
             + U.section(U.head_block("Colour", "Palette.")
                         + '<div class="grid grid--4">%s</div>' % swatches)
-            + U.section(U.head_block("Type", "Roboto, five weights.") + type_rows,
+            + U.section(U.head_block("Type", "Roboto, four weights.") + type_rows,
                         variant="grey")
             + U.section(U.head_block("Components", "Buttons and links.")
                         + buttons + '<p style="margin-top:28px">%s</p>'
@@ -417,9 +435,10 @@ def build_all(out, pages_data):
     case_cards = [U.card(t, lead, fn, meta=sector)
                   for fn, (t, sector, lead, _i) in I.CASES.items()]
     put("brands.html", listing(
-        "brands.html", "Brands", "Brands we distribute.",
-        "How food, household, health and dental brands reached chain listings and practice "
-        "shelves through GDH.", case_cards, "brands", "Programmes we run."))
+        "brands.html", "Programmes", "How a GDH programme works.",
+        "The shapes a distribution programme takes, by channel — what we take on, what "
+        "changes, and what the brand is left to do.", case_cards, "brands",
+        "The shapes they take."))
     for fn, (title, sector, lead, items) in I.CASES.items():
         put(fn, article(fn, sector, title, lead, items,
                         ("All brands", "brands.html"),
@@ -428,7 +447,7 @@ def build_all(out, pages_data):
     # --- articole
     post_cards = [U.card(title, paras[0][:132].rsplit(" ", 1)[0] + "…", fn,
                          meta="%s · %s" % (cat, date))
-                  for fn, (cat, date, title, paras) in I.POSTS.items()]
+                  for fn, (cat, date, title, paras) in newest_first(I.POSTS)]
     put("insights.html", listing(
         "insights.html", "Insights", "From the commercial desk.",
         "Practical guidance on chain listings, on-shelf availability, sell-out data and the "
@@ -450,6 +469,27 @@ def build_all(out, pages_data):
     put("licenses.html", simple_page("licenses.html", C.LICENCES))
     put("changelog.html", simple_page("changelog.html", C.CHANGELOG))
     put("404.html", simple_page("404.html", C.NOT_FOUND, noindex=True))
+    # paginile juridice, de presa si de contact comercial
+    try:
+        import legal_data_gdh
+        for entry in legal_data_gdh.PAGES:
+            name = entry["slug"] + ".html"
+            note = ""
+            if entry.get("needsReview"):
+                note = U.section(
+                    '<div class="tile" style="border-left-color:var(--accent)">'
+                    '<p class="card__meta">Before publication</p>'
+                    '<p class="muted" style="margin-top:8px">This page is a working draft. '
+                    'The details shown in square brackets must be completed from the '
+                    'company’s own registration documents, and the text should be reviewed '
+                    'by a qualified adviser before it is relied upon.</p></div>',
+                    tight=True, reveal=False)
+            put(name, simple_page(name, dict(
+                kicker=entry["kicker"], title=entry["title"], lede=entry["lede"],
+                sections=entry["sections"]), extra=note))
+    except ImportError:
+        pass
+
     put("contact.html", contact_page())
     put("style-guide.html", style_guide())
     return written

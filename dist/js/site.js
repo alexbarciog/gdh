@@ -11,6 +11,17 @@
   };
   var mqDesktop = window.matchMedia("(min-width: 1081px)");
 
+  /* Safari sub 14 nu are addEventListener pe MediaQueryList, doar addListener.
+   * Fara verificarea asta exceptia oprea tot boot()-ul, iar pagina ramanea fara
+   * acordeon, fara formular si — inainte de scaparea din CSS — fara continut. */
+  function onDesktopChange(fn) {
+    if (typeof mqDesktop.addEventListener === "function") {
+      mqDesktop.addEventListener("change", fn);
+    } else if (typeof mqDesktop.addListener === "function") {
+      mqDesktop.addListener(fn);
+    }
+  }
+
   /* ------------------------------------------------------------ mega-meniu */
   function initMega() {
     var header = document.getElementById("gdh-header");
@@ -58,11 +69,14 @@
       trigger.addEventListener("focus", function () {
         if (mqDesktop.matches) { hold(); open(trigger); }
       });
+      // focusul intrat in panou il tine deschis, ca sa se poata tabula prin el
+      if (panel) panel.addEventListener("focusin", hold);
     });
 
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && openOne) { openOne.focus(); close(); }
     });
+    onDesktopChange(close);
     document.addEventListener("click", function (e) {
       if (!openOne) return;
       if (header.contains(e.target)) return;
@@ -95,9 +109,7 @@
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") set(false);
     });
-    mqDesktop.addEventListener("change", function (e) {
-      if (e.matches) set(false);
-    });
+    onDesktopChange(function (e) { if (e.matches) set(false); });
 
     $(".drawer__top", drawer).forEach(function (top) {
       if (top.tagName !== "BUTTON") return;
@@ -124,7 +136,15 @@
         function set(open) {
           item.classList.toggle("is-open", open);
           top.setAttribute("aria-expanded", open ? "true" : "false");
+          if (open) panel.hidden = false;
+          // inaltimea masurata se foloseste doar pentru animatie; dupa ea
+          // panoul trece pe auto, ca sa nu taie textul daca fontul se schimba
           panel.style.height = open ? panel.scrollHeight + "px" : "0px";
+          if (!open) {
+            window.setTimeout(function () {
+              if (!item.classList.contains("is-open")) panel.hidden = true;
+            }, 320);
+          }
         }
         top.addEventListener("click", function () {
           var open = !item.classList.contains("is-open");
@@ -138,7 +158,14 @@
           });
           set(open);
         });
-        if (i === 0) set(true);
+        if (i === 0) {
+          item.classList.add("is-open");
+          top.setAttribute("aria-expanded", "true");
+          panel.hidden = false;
+          panel.style.height = "auto";
+        } else {
+          panel.hidden = true;
+        }
         window.addEventListener("resize", function () {
           if (item.classList.contains("is-open")) panel.style.height = panel.scrollHeight + "px";
         });
@@ -166,9 +193,11 @@
     /* Plasa de siguranta: daca observatorul nu apuca sa anunte un element —
      * fila deschisa in fundal, o incarcare intrerupta — bucata aia de pagina ar
      * ramane invizibila pentru totdeauna. */
+    var rounds = 0;
     var guard = window.setInterval(function () {
       var left = $("[data-reveal]:not(.is-in)");
-      if (!left.length) { window.clearInterval(guard); return; }
+      // dupa doua minute orice element ramas e pur si simplu sub ecran
+      if (!left.length || ++rounds > 100) { window.clearInterval(guard); return; }
       left.forEach(function (el) {
         var r = el.getBoundingClientRect();
         if (r.top < window.innerHeight + 200 && r.bottom > -200) {
@@ -221,12 +250,13 @@
   }
 
   function boot() {
-    initChrome();
-    initMega();
-    initDrawer();
-    initAccordion();
-    initReveal();
-    initForms();
+    // de aici incolo CSS-ul are voie sa ascunda sectiunile pentru aparitii
+    document.documentElement.classList.add("js");
+    [initChrome, initMega, initDrawer, initAccordion, initReveal, initForms]
+      .forEach(function (fn) {
+        // o parte stricata nu mai duce la o pagina goala
+        try { fn(); } catch (e) { if (window.console) console.error(e); }
+      });
   }
 
   if (document.readyState === "loading") {

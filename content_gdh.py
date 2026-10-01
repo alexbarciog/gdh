@@ -28,7 +28,7 @@ NAV = [
             ("Laboratories", "sector-dental-laboratories.html"),
         ]),
         dict(title="Proof", links=[
-            ("Brands we distribute", "brands.html"),
+            ("How programmes work", "brands.html"),
             ("Insights", "insights.html"),
         ]),
         dict(title="Start here", links=[
@@ -55,7 +55,7 @@ NAV = [
             ("Contact sales", "contact.html"),
         ]),
     ]),
-    dict(key="brands", title="Brands", href="brands.html"),
+    dict(key="brands", title="Programmes", href="brands.html"),
     dict(key="insights", title="Insights", href="insights.html"),
     dict(key="about", title="About us", href="about-us.html"),
 ]
@@ -63,6 +63,7 @@ NAV = [
 TOPBAR = [
     ("Contact", "contact.html"),
     ("Careers", "careers.html"),
+    ("News", "news.html"),
     ("Locations", "locations.html"),
     ("Partner with us", "partner-with-us.html"),
 ]
@@ -85,18 +86,25 @@ FOOTER_NAV = [
     ]),
     dict(title="Company", links=[
         ("About us", "about-us.html"),
-        ("Brands we distribute", "brands.html"),
+        ("How programmes work", "brands.html"),
         ("Insights", "insights.html"),
         ("Careers", "careers.html"),
+        ("News", "news.html"),
         ("Locations", "locations.html"),
         ("Contact", "contact.html"),
+        ("Contact sales", "contact-sales.html"),
+        ("Style guide", "style-guide.html"),
+        ("Changelog", "changelog.html"),
     ]),
 ]
 
 LEGAL = [
-    ("Licences & credits", "licenses.html"),
-    ("Style guide", "style-guide.html"),
-    ("Changelog", "changelog.html"),
+    ("Privacy", "privacy.html"),
+    ("Legal notice", "imprint.html"),
+    ("Terms", "terms.html"),
+    ("Cookies", "cookies.html"),
+    ("Whistleblowing", "whistleblowing.html"),
+    ("Licences", "licenses.html"),
 ]
 
 # --------------------------------------------------------------- prima pagina
@@ -138,7 +146,6 @@ HOME = dict(
     services_lede="From the first buyer meeting to the shelf and back again. Take one piece "
                   "or the whole route to market.",
     stats_title="The network, in short.",
-    stats_note="Figures describe the GDH network and are reviewed each quarter.",
     cta_title="Send us your range.",
     cta_text="Tell us what you make, which chains you want to reach and what you can supply "
              "each month. We will tell you honestly where it fits.",

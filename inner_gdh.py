@@ -265,9 +265,8 @@ CASES = {
          ("What we did",
           "We reworked the pack format and case configuration to what those two buyers actually expect, "
           "took the range into an existing category review, and bought the opening order ourselves."),
-         ("The result",
-          "Listed in both chains within one season, national distribution across 680 stores, and a "
-          "producer whose only operational change was making more.")]),
+         ("What changes",
+          "A national listing in both chains, carried by us rather than chased by the producer, whose only operational change is making more.")]),
     "case-drugstore-chain-rollout.html": (
         "Drugstore Chain Rollout", "Health & Beauty",
         "Placing a personal care range into a national drugstore chain and holding the shelf afterwards.",
@@ -277,9 +276,8 @@ CASES = {
          ("What we did",
           "We took over distribution and put the range on our field merchandising round: facings "
           "corrected weekly, displays rebuilt, promotional space set up on day one of each campaign."),
-         ("The result",
-          "Sell-out per store rose by just under a third over two quarters, and the range gained a "
-          "facing at the following review instead of losing one.")]),
+         ("What changes",
+          "A range that stops quietly losing facings between category reviews, because somebody is in the store every week putting it back.")]),
     "case-dental-consumables-rollout.html": (
         "Dental Consumables Rollout", "Dental",
         "Putting a consumables range into dental practices and laboratories across the country.",
@@ -289,9 +287,8 @@ CASES = {
          ("What we did",
           "The range went onto our existing dental delivery cycle, introduced by the people who already "
           "call on those practices every week, with samples carried on the same vans."),
-         ("The result",
-          "Stocked in more than 380 practices and laboratories inside a year, at a fraction of what "
-          "building a dental sales force would have cost.")]),
+         ("What changes",
+          "Presence in practices and laboratories across the country, without the manufacturer building a dental sales force to get there.")]),
     "case-dental-equipment-distribution.html": (
         "Dental Equipment Distribution", "Dental",
         "Adding small equipment to a consumables relationship that was already running weekly.",
@@ -302,9 +299,8 @@ CASES = {
           "Equipment added to the practices we already supply, with installation scheduled against our "
           "delivery calendar and warranty claims handled by our own desk rather than bounced back to "
           "the manufacturer."),
-         ("The result",
-          "Units placed through practices that already trusted the delivery relationship, and warranty "
-          "response measured in days instead of weeks.")]),
+         ("What changes",
+          "Units placed through practices that already trust the delivery relationship, with installation and warranty handled by the people who bring the consumables.")]),
     "case-convenience-chains.html": (
         "Convenience & Proximity Chains", "Convenience",
         "Reaching 1.100 small-format stores that no single brand can economically serve alone.",
@@ -315,9 +311,8 @@ CASES = {
          ("What we did",
           "The range joined a mixed route already delivering other categories into those stores, so the "
           "cost of the drop was shared across everything on the van."),
-         ("The result",
-          "1.100 convenience stores added as a channel, with a cost per drop no single-brand operation "
-          "could have reached.")]),
+         ("What changes",
+          "Convenience added as a channel at a cost per drop no single brand could reach alone, because the van is already going there.")]),
     "case-private-label.html": (
         "Private Label for a Chain", "Private Label",
         "Matching a chain's own-brand brief to a producer who could actually deliver it.",
@@ -327,7 +322,7 @@ CASES = {
          ("What we did",
           "We brought in a producer from our existing portfolio, managed specification and packaging "
           "against the chain's brief, and took commercial responsibility for supply."),
-         ("The result",
+         ("What changes",
           "A private-label line in national distribution, a producer with volume it could plan around, "
           "and a chain with one accountable counterpart instead of three.")]),
     "case-seasonal-promotion.html": (
@@ -339,9 +334,8 @@ CASES = {
          ("What we did",
           "Promotional stock pre-positioned at our hubs before week one, display units delivered on "
           "the same vans, and our field teams building and photographing every site on the day."),
-         ("The result",
-          "Displays live in 1.400 stores inside the first three days of the promotion, with "
-          "photographic proof per store and no out-of-stocks during the campaign.")]),
+         ("What changes",
+          "Displays built in the opening days of a promotion rather than its final week, with photographic proof from every store visited.")]),
     "case-market-entry.html": (
         "Market Entry for an Imported Brand", "Market Entry",
         "Bringing an established foreign brand into the market without it opening an office here.",
@@ -351,14 +345,14 @@ CASES = {
          ("What we did",
           "We handled labelling and local compliance, chose two chains for the entry rather than "
           "chasing all of them, bought the opening stock and ran the launch from our own warehouses."),
-         ("The result",
+         ("What changes",
           "A market entry that cost the brand no local infrastructure, with the third and fourth chain "
           "added once the first two had proven the sell-out.")]),
 }
 
 POSTS = {
     "post-what-a-chain-buyer-decides.html": (
-        "Retail Strategy", "June 10, 2026",
+        "Retail Strategy", "10 June 2026",
         "What a chain buyer is actually deciding",
         [("Brands prepare for a buyer meeting by talking about their product. Buyers are not deciding "
           "whether your product is good. They are deciding what comes off the shelf to make room for "
@@ -370,7 +364,7 @@ POSTS = {
           "hearing. The buyer is not evaluating a stranger's claim — they are evaluating a proposal "
           "from someone whose other lines they can already measure.")]),
     "post-listings-and-facings.html": (
-        "Shelf Execution", "October 9, 2026",
+        "Shelf Execution", "18 August 2026",
         "A listing is permission. A facing is the actual business.",
         [("Winning a listing feels like the finish line, and for a lot of brands it is where the work "
           "stops. The product is in the system, the first order ships, and everyone moves on."),
@@ -381,7 +375,7 @@ POSTS = {
           "at once. Somebody has to be in the store. Either you pay a field force to do it, or you work "
           "with a distributor whose people are already walking that aisle for other reasons.")]),
     "post-sell-out-not-sell-in.html": (
-        "Data & Insight", "October 8, 2026",
+        "Data & Insight", "2 September 2026",
         "Sell-in is not sell-out, and only one of them matters",
         [("Most producers manage their business on sell-in: what left the warehouse, what was invoiced, "
           "what the distributor ordered. It is the easiest number to get and the least informative one "
@@ -393,7 +387,7 @@ POSTS = {
           "pack size works, whether the price point works, whether the promotion did anything, and "
           "which stores should never have been listed. Ask for it before you sign with anyone.")]),
     "post-retailers-shifting-risk.html": (
-        "Retail News & Trends", "October 7, 2026",
+        "Retail News & Trends", "16 September 2026",
         "Retailers are shifting risk onto suppliers — quietly",
         [("Shorter order lead times, tighter receiving windows and penalties for partial deliveries have "
           "all become normal. None of them appear as a price change, but every one of them moves cost "
@@ -402,7 +396,7 @@ POSTS = {
           "receiving window costs them, and they negotiate frequency and drop size accordingly."),
          ("The ones handling it badly are absorbing it silently and wondering why margin is drifting.")]),
     "post-before-you-approach-a-chain.html": (
-        "Practical Guides", "March 11, 2026",
+        "Practical Guides", "11 March 2026",
         "A checklist before you approach a national chain",
         [("Most first meetings with a chain buyer fail on preparation, not on product. The questions are "
           "predictable, and not having the answers ends the conversation politely and permanently."),
@@ -414,7 +408,7 @@ POSTS = {
           "worst outcome in this business is not being turned down — it is winning a listing you cannot "
           "supply.")]),
     "post-on-shelf-availability.html": (
-        "Availability", "April 22, 2026",
+        "Availability", "22 April 2026",
         "On-shelf availability is the only number the shopper feels",
         [("Warehouse productivity, vehicle fill and cost per pallet all matter internally. The shopper "
           "experiences exactly one thing: whether the product was there when they reached for it."),
@@ -425,7 +419,7 @@ POSTS = {
           "not get delivered, or it got delivered and never made it onto the shelf. The third is far "
           "more common than most brands believe.")]),
     "post-the-dental-channel.html": (
-        "Dental Channel", "October 4, 2026",
+        "Dental Channel", "24 September 2026",
         "The dental channel does not behave like retail",
         [("Brands that succeed in retail often assume dentistry is the same game at a smaller scale. It "
           "is not. The order is small, frequent and clinically specific, and the person deciding is the "
@@ -436,7 +430,7 @@ POSTS = {
          ("Which is why distribution matters more here than almost anywhere. A new line introduced by "
           "someone the practice already relies on gets tried. The same line in a mailshot does not.")]),
     "post-private-label.html": (
-        "Private Label", "October 3, 2026",
+        "Private Label", "29 September 2026",
         "Private label is not your enemy. It is often your best customer.",
         [("Producers treat a chain's own-brand range as the competition, and in shelf terms it is. But "
           "somebody manufactures it, and that somebody gets volume they can plan a year around."),

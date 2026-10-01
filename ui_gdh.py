@@ -77,17 +77,21 @@ def _mega(group):
 
 def header(nav, logo_src, current=""):
     """Bara principala: sigla, navigatie cu mega-meniu, actiune, buton de telefon."""
-    links, megas = [], []
+    links = []
     for group in nav:
-        cls = "nav__link" + (" is-current" if group.get("key") == current else "")
+        here = group.get("key") == current
+        cls = "nav__link" + (" is-current" if here else "")
+        # aria-current, nu doar o clasa de CSS: altfel pagina curenta nu e
+        # anuntata de cititoarele de ecran
+        mark = ' aria-current="page"' if here else ""
         if group.get("columns"):
-            links.append('<a class="%s" href="%s" data-mega="mega-%s" '
-                         'aria-expanded="false">%s</a>'
-                         % (cls, esc(group["href"]), group["id"], esc(group["title"])))
-            megas.append(_mega(group))
+            links.append('<a class="%s" href="%s"%s data-mega="mega-%s" '
+                         'aria-expanded="false">%s</a>%s'
+                         % (cls, esc(group["href"]), mark, group["id"],
+                            esc(group["title"]), _mega(group)))
         else:
-            links.append('<a class="%s" href="%s">%s</a>'
-                         % (cls, esc(group["href"]), esc(group["title"])))
+            links.append('<a class="%s" href="%s"%s>%s</a>'
+                         % (cls, esc(group["href"]), mark, esc(group["title"])))
     return (
         '<header class="header" id="gdh-header">'
         '<div class="wrap">'
@@ -98,7 +102,7 @@ def header(nav, logo_src, current=""):
         '<a class="btn btn--primary nav__cta" href="contact.html">Contact sales%s</a>'
         '<button class="burger" type="button" aria-expanded="false" '
         'aria-controls="gdh-drawer" aria-label="Menu"><span></span></button>'
-        '</div>%s</header>' % (esc(logo_src), "".join(links), ARROW, "".join(megas)))
+        '</div></header>' % (esc(logo_src), "".join(links), ARROW))
 
 
 def drawer(nav):
@@ -111,12 +115,14 @@ def drawer(nav):
                              % (esc(col["title"]),
                                 "".join('<li><a href="%s">%s</a></li>' % (esc(h), esc(t))
                                         for t, h in col["links"])))
+            pid = "drawer-%s" % group.get("id", group["title"].lower().replace(" ", "-"))
             groups.append(
                 '<div class="drawer__group">'
-                '<button class="drawer__top" type="button" aria-expanded="false">%s'
-                '<span class="topics__arrow">+</span></button>'
-                '<div class="drawer__panel">%s</div></div>'
-                % (esc(group["title"]), "".join(inner)))
+                '<button class="drawer__top" type="button" aria-expanded="false" '
+                'aria-controls="%s">%s'
+                '<span class="topics__arrow" aria-hidden="true">+</span></button>'
+                '<div class="drawer__panel" id="%s">%s</div></div>'
+                % (pid, esc(group["title"]), pid, "".join(inner)))
         else:
             groups.append('<div class="drawer__group">'
                           '<a class="drawer__top" href="%s">%s</a></div>'
@@ -140,7 +146,7 @@ def footer(nav, logo_src, legal):
         'decoding="async" style="height:48px"></a>'
         '<p class="muted" style="margin-top:20px;max-width:34ch">GDH buys, stocks and '
         'distributes retail and dental products into the country’s largest store '
-        'chains — at no cost to the brands we carry.</p></div>'
+        'chains and dental practices — at no cost to the brands we carry.</p></div>'
         '%s</div>'
         '<div class="footer__legal"><p>© 2026 GDH — Global Distribution Holdings. '
         'All rights reserved.</p><ul>%s</ul></div>'
@@ -216,7 +222,7 @@ def tile(title, text, href):
 
 
 def topics(items):
-    links = "".join('<a href="%s">%s<span class="topics__arrow">%s</span></a>'
+    links = "".join('<a href="%s">%s<span class="topics__arrow" aria-hidden="true">%s</span></a>'
                     % (esc(h), esc(t), "&rarr;") for t, h in items)
     return '<div class="topics">%s</div>' % links
 
