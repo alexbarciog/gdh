@@ -121,13 +121,15 @@ HOME = dict(
              text="Most brands we carry arrive after years of pitching chain buyers on their "
                   "own. We already supply those buyers every week, so your range enters a "
                   "conversation that is already happening.",
-             href="service-chain-listings.html"),
+             href="service-chain-listings.html",
+             image="img/automation.webp"),
         dict(kicker="The dental channel",
              title="Dentistry does not buy like retail.",
              text="Small, frequent, clinically specific orders, decided by the practitioner. "
                   "We are in those practices every week, which is a far shorter road than "
                   "building a dental sales force from scratch.",
-             href="sector-dental.html"),
+             href="sector-dental.html",
+             image="img/stock-check.webp"),
     ],
     sectors_title="Two channels, one network.",
     sectors_lede="Retail and dental share our warehouses and our delivery routes. Each has "

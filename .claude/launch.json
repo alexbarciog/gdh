@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "gdh",
+      "name": "gdh-dist",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8752", "--directory", "dist"],
-      "port": 8752
+      "runtimeArgs": ["/private/tmp/claude-501/-Users-alexbarciog-Downloads-e/4debb6ed-7e82-4d39-a0c7-935fd10f105a/scratchpad/serve.py"],
+      "port": 8777
     }
   ]
 }

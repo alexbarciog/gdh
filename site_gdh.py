@@ -15,9 +15,29 @@ import ui_gdh as U
 LOGO_DARK = "img/gdh-logo.png"        # pe fundal deschis
 LOGO_LIGHT = "img/gdh-logo-light.png"  # pe fundal inchis
 
-# Slot-uri de imagine. Gol = se randeaza curat, fara poza. Pune aici fisierele
-# tale cand le ai; restul paginii nu trebuie atins.
-IMAGES = {}
+# Slot-uri de imagine: pagina -> fisier din dist/img. O pagina care nu apare
+# aici se randeaza curat, fara fotografie. Pentru raft si cabinet stomatologic
+# inca nu avem fotografii, deci acele pagini raman fara.
+IMAGES = {
+    "index.html": "img/warehouse-racking.webp",
+    "sectors.html": "img/warehouse-wide.webp",
+    "sector-retail.html": "img/fulfilment.webp",
+    "sector-grocery.html": "img/packing.webp",
+    "sector-convenience.html": "img/sortation.webp",
+    "sector-private-label.html": "img/automation.webp",
+    "distribution.html": "img/sortation.webp",
+    "service-chain-listings.html": "img/planning.webp",
+    "service-stock-and-delivery.html": "img/warehouse-racking.webp",
+    "service-shelf-execution.html": "img/team.webp",
+    "service-sell-out-visibility.html": "img/stock-check.webp",
+    "service-returns.html": "img/packing.webp",
+    "brands.html": "img/fulfilment.webp",
+    "insights.html": "img/planning.webp",
+    "about-us.html": "img/team.webp",
+    "careers.html": "img/team.webp",
+    "locations.html": "img/warehouse-wide.webp",
+    "partner-with-us.html": "img/planning.webp",
+}
 
 
 def img(slot):
@@ -174,7 +194,7 @@ def home():
     h = C.HOME
     hero = U.hero(h["kicker"], h["title"], h["lede"],
                   [U.btn("Partner with us", "partner-with-us.html"),
-                   U.btn("What we do", "distribution.html", "on-dark")],
+                   U.btn("What we do", "distribution.html", "grad")],
                   image=img("index.html"))
 
     topics = U.section(
@@ -183,11 +203,12 @@ def home():
 
     features = U.section("".join(
         '<div class="split%s" style="margin-bottom:64px">'
-        '<div class="split__media"%s></div><div>%s<h2 class="h1">%s</h2>'
+        '<div class="split__media">%s</div><div>%s<h2 class="h1">%s</h2>'
         '<p class="muted" style="margin-top:16px">%s</p>'
         '<div style="margin-top:24px">%s</div></div></div>'
         % (" split--reverse" if i % 2 else "",
-           ' style="background:var(--g100);aspect-ratio:4/3"',
+           ('<img src="%s" alt="" loading="lazy" decoding="async">' % U.esc(f["image"]))
+           if f.get("image") else '<div style="background:var(--g100);aspect-ratio:4/3"></div>',
            U.eyebrow(f["kicker"]), U.esc(f["title"]), U.esc(f["text"]),
            U.link_arrow("Read more", f["href"]))
         for i, f in enumerate(h["features"])), variant="grey")
@@ -210,13 +231,14 @@ def home():
                      U.link_arrow("See everything we do", "distribution.html"))
         + '<div class="grid grid--4">%s</div>' % "".join([
             U.card("Chain listings", "We take your range to the buyers we already supply.",
-                   "service-chain-listings.html", meta="01"),
+                   "service-chain-listings.html", meta="01", image="img/planning.webp"),
             U.card("Stock & delivery", "We buy the stock and supply every depot and store.",
-                   "service-stock-and-delivery.html", meta="02"),
+                   "service-stock-and-delivery.html", meta="02",
+                   image="img/warehouse-racking.webp"),
             U.card("Shelf execution", "Our people place it, hold the planogram and report back.",
-                   "service-shelf-execution.html", meta="03"),
+                   "service-shelf-execution.html", meta="03", image="img/team.webp"),
             U.card("Sell-out visibility", "What sold, where, and how fast — back to you.",
-                   "service-sell-out-visibility.html", meta="04"),
+                   "service-sell-out-visibility.html", meta="04", image="img/stock-check.webp"),
         ]), variant="grey")
 
     stats = U.section(

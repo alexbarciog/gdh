@@ -91,6 +91,21 @@ def build_js():
 
 
 # --------------------------------------------------------------------- 4
+def copy_images():
+    """Fotografiile si gradientul, din img_src/ in dist/img."""
+    src = os.path.join(SRC, "img_src")
+    if not os.path.isdir(src):
+        log("  ! img_src lipseste — paginile se randeaza fara fotografii")
+        return
+    n = 0
+    for fn in sorted(os.listdir(src)):
+        if fn.startswith("."):
+            continue
+        shutil.copy2(os.path.join(src, fn), os.path.join(OUT, "img", fn))
+        n += 1
+    log("  imagini copiate: %d" % n)
+
+
 def build_logo():
     import logo_gdh as LG
     meta = LG.build(os.path.join(SRC, "gdh-logo-source.png"), os.path.join(OUT, "img"))
@@ -152,8 +167,9 @@ if __name__ == "__main__":
     log("3/7 css + js")
     build_css()
     build_js()
-    log("4/7 sigla")
+    log("4/7 sigla si imagini")
     build_logo()
+    copy_images()
     log("5/7 pagini")
     pages = S.build_all(OUT, load_pages_data())
     S.deploy_files(OUT, pages)
