@@ -4,8 +4,10 @@ Folderul asta are două părți:
 
 | Ce | Unde |
 |---|---|
-| **Site-ul final, de urcat pe Cloudflare** | `dist/` |
+| **Site-ul final, pe care il publica Cloudflare** | `dist/` |
 | Sursa (snapshot-ul original + scripturile de build) | restul folderului |
+
+Totul sta pe ramura `main`. Detalii despre build si publicare: [SURSE.md](SURSE.md).
 
 ## Site-ul (`dist/`)
 
@@ -24,14 +26,8 @@ Folderul asta are două părți:
 
 ### Publicare pe Cloudflare Pages
 
-1. Dashboard → Workers & Pages → Create → Pages → **Upload assets**.
-2. Trage folderul `dist` în zona de upload. Fără build command.
-
-Sau din linia de comandă, din interiorul `dist`:
-
-```bash
-npx wrangler pages deploy .
-```
+Proiectul Pages e legat la repo: build command gol, build output directory `dist`.
+Fiecare push pe `main` redeployeaza singur.
 
 `dist/_headers` setează cache-ul și un CSP care blochează orice cerere în afara domeniului.
 
@@ -42,10 +38,11 @@ Dublu-click pe `START.bat` → http://localhost:8752
 ## Reconstruire
 
 ```bash
-python build_gdh.py
+python3 -m pip install --user pillow fonttools
+python3 build_gdh.py
 ```
 
 Scripturile: `build_gdh.py` (resurse, CSS, logo), `pages_gdh.py` (paginile din snapshot),
 `inner_gdh.py` (paginile interioare scrise de noi), `copy_gdh.py` (textele), `site_js.js` (JS-ul).
 
-Snapshot-ul Webflow original e păstrat intact la `../e-backup-webflow`.
+Snapshot-ul Webflow original e păstrat intact în `*_files/`.

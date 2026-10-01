@@ -125,24 +125,29 @@ def build_fonts():
     blocks = re.findall(r"/\*\s*([a-z-]+)\s*\*/\s*(@font-face\s*\{.*?\})", css, re.S)
     out = []
     n = 0
+    # Google serveste Inter Tight ca font variabil: acelasi fisier pentru toate
+    # cele cinci grosimi. Numim fisierul dupa continut, nu dupa grosime, ca sa
+    # nu salvam de cinci ori aceiasi octeti (525 KB degeaba).
+    files = {}
     for subset, block in blocks:
         if subset not in ("latin", "latin-ext"):
             continue
         m = re.search(r"url\((https://[^)]+)\)", block)
         if not m:
             continue
-        url = m.group(1)
-        data = download(url)
-        weight = re.search(r"font-weight:\s*(\d+)", block).group(1)
-        fn = "inter-tight-%s-%s.woff2" % (weight, subset)
-        open(os.path.join(OUT, "fonts", fn), "wb").write(data)
+        data = download(m.group(1))
+        fn = "inter-tight-%s-%s.woff2" % (subset, hashlib.md5(data).hexdigest()[:8])
+        if fn not in files:
+            open(os.path.join(OUT, "fonts", fn), "wb").write(data)
+            files[fn] = len(data)
         block = block.replace(m.group(0), "url(../fonts/%s)" % fn)
         block = block.replace("font-style: normal;", "font-style: normal;\n  font-display: swap;")
         out.append(block)
         n += 1
     open(os.path.join(OUT, "css", "fonts.css"), "w", encoding="utf-8").write(
         "/* Inter Tight - gazduit local, fara conexiuni externe */\n" + "\n".join(out) + "\n")
-    log("  fonturi Inter Tight locale:", n)
+    log("  fonturi Inter Tight: %d declaratii, %d fisiere (%d KB)"
+        % (n, len(files), sum(files.values()) // 1024))
 
 
 # --------------------------------------------------------------------------
@@ -179,6 +184,12 @@ def build_css():
 
     # regulile pentru insigna "Made in Webflow" nu au ce cauta aici
     css = re.sub(r"[^{}]*\.w-webflow-badge[^{}]*\{[^}]*\}", "", css)
+    # rosul GDH in locul portocaliului din sablon, peste tot in CSS
+    # si forma pe 8 cifre, cu alfa (#fe3e0280), nu doar cea pe 6
+    css = re.sub(r"#fe3e02([0-9a-f]{2})?\b", lambda m: "#db020d" + (m.group(1) or ""),
+                 css, flags=re.I)
+    css = re.sub(r"rgba?\(\s*254\s*,\s*62\s*,\s*2\s*", "rgba(219, 2, 13", css)
+    css = css.replace("#ffefe6", "#ffe9ea")   # tenta calda a insignei, acordata la rosu
     css = w_rename(css)
     # familia proprie de fonturi, fara referinte la template
     css = css.replace("Generalsans", "GDH Sans")
@@ -188,7 +199,7 @@ def build_css():
 
     brand = """
 /* ---------- GDH brand ---------- */
-:root{--gdh-red:#e01021;--gdh-red-dark:#b70d1a;--gdh-ink:#111111;}
+:root{--gdh-red:#db020d;--gdh-red-dark:#a80209;--gdh-ink:#111111;}
 .gdh-logo{display:block;height:auto;width:auto;max-width:100%}
 .gdh-logo--nav{height:54px}
 .gdh-logo--footer{height:66px}
@@ -329,8 +340,8 @@ def build_brand_assets():
     fonts = A.load_fonts(OUT, os.path.join(_cache, "ttf"))
     A.build_icons(OUT, fonts)
     A.build_og(OUT, fonts,
-               "From our racks to your shelves.",
-               "Warehousing · Order fulfilment · Route delivery · Retail execution",
+               "Your product, in the country’s biggest chains.",
+               "Retail distribution · Dental distribution · Shelf execution",
                C.SITE_URL.split("//")[-1],
                HERO_PHOTO)
     A.build_manifest(OUT, C.SITE_NAME, "GDH")
@@ -349,10 +360,10 @@ def finalize():
     # navigatia vine din index, deci ar marca "Home" ca pagina curenta peste tot
     nav = nav.replace(' g--current', '').replace(' aria-current="page"', '')
     footer = extract_block(index, 'class="section footer"')
+    # iconitele si theme-color vin din head_common; un link catre
+    # img/favicon.svg ar da 404, fisierul ala nu se genereaza
     css_head = ('<link rel="stylesheet" href="css/fonts.css">'
-                '<link rel="stylesheet" href="css/site.css">'
-                '<link rel="icon" href="img/favicon.svg" type="image/svg+xml">'
-                '<meta name="theme-color" content="#e01021">')
+                '<link rel="stylesheet" href="css/site.css">')
     import inner_gdh
     pages = inner_gdh.build(OUT, nav, footer, css_head)
     log("  pagini interioare:", len(pages))
@@ -371,6 +382,12 @@ def finalize():
         "\n/fonts/*\n  Cache-Control: public, max-age=31536000, immutable\n"
         "\n/css/*\n  Cache-Control: public, max-age=604800\n"
         "\n/js/*\n  Cache-Control: public, max-age=604800\n")
+    # adresele vechi raman valide: Cloudflare Pages citeste _redirects
+    import inner_gdh as _I
+    open(os.path.join(OUT, "_redirects"), "w", encoding="utf-8").write(
+        "".join("/%s  /%s  301\n" % (was[:-5], now[:-5])
+                for was, now in sorted(_I.RENAME.items())))
+
     open(os.path.join(OUT, "robots.txt"), "w", encoding="utf-8").write(
         "User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n" % __import__("copy_gdh").SITE_URL)
 
@@ -385,30 +402,22 @@ def finalize():
     open(os.path.join(OUT, "sitemap.xml"), "w", encoding="utf-8").write("\n".join(sm) + "\n")
 
     open(os.path.join(OUT, "README.md"), "w", encoding="utf-8").write(
-        "# GDH — Global Distribution Holdings\n\n"
+        "# GDH - Global Distribution Holdings (site generat)\n\n"
+        "Folderul asta e **generat**: il rescrie `python3 build_gdh.py` din radacina\n"
+        "repo-ului, la fiecare rulare. Nu edita nimic aici, se pierde la urmatorul build.\n"
+        "Sursele si instructiunile sunt in `../SURSE.md`.\n\n"
         "Site static, fara nicio resursa externa: fonturile, imaginile, CSS-ul si JS-ul\n"
-        "sunt servite din acest repo. Radacina repo-ului **este** site-ul, deci nu exista\n"
-        "pas de build.\n\n"
+        "sunt servite de pe acelasi domeniu.\n\n"
         "| | |\n|---|---|\n"
-        "| Pagini | 32 |\n| Cereri catre alte domenii | 0 |\n"
+        "| Pagini | %d |\n| Cereri catre alte domenii | 0 |\n"
         "| Fonturi | Inter Tight + GDH Sans, locale |\n"
         "| Animatii | GSAP + ScrollTrigger + SplitText, locale (`js/animations.js`) |\n\n"
-        "## Publicare pe Cloudflare Pages\n\n"
-        "**Din acest repo (recomandat):** Cloudflare Dashboard -> Workers & Pages -> Create\n"
-        "-> Pages -> Connect to Git -> alege `ghbr`. Apoi:\n\n"
-        "- Framework preset: **None**\n"
-        "- Build command: **(gol)**\n"
-        "- Build output directory: **/**\n\n"
-        "Fiecare push pe `main` redeployeaza automat.\n\n"
-        "**Fara Git:** Create -> Pages -> Upload assets si trage continutul folderului.\n"
-        "Sau din linia de comanda, din radacina:\n\n"
-        "    npx wrangler pages deploy .\n\n"
-        "`_headers` seteaza cache-ul si o politica CSP care blocheaza orice cerere in afara\n"
-        "domeniului.\n\n"
-        "## Modificari\n\n"
-        "Fisierele de aici sunt generate. Sursele (textele, paginile interioare, logo-ul,\n"
-        "animatiile) stau local in folderul de build, iar `python build_gdh.py` le regenereaza\n"
-        "peste acest folder fara sa atinga `.git`.\n")
+        "## Publicare\n\n"
+        "Cloudflare Pages e legat la repo, cu build command gol si build output\n"
+        "directory `dist`. Fiecare push pe `main` redeployeaza singur.\n\n"
+        "`_headers` seteaza cache-ul si o politica CSP care blocheaza orice cerere in\n"
+        "afara domeniului. `_redirects` tine in viata adresele vechi.\n"
+        % len(urls))
 
 
 if __name__ == "__main__":

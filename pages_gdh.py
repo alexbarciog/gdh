@@ -4,18 +4,26 @@ import os, re, html, shutil, json
 import copy_gdh as C
 
 FAQ_ANSWERS = [
-    "We store, pick, pack and deliver physical goods: food and beverage, household and personal care, "
-    "pharmacy and para-pharmacy, and light industrial supplies. For the stores we serve we also handle "
-    "shelf placement, promotional set-up and returns.",
-    "Most quotes go out within two working days. If you send us your SKU list, average monthly volumes and "
-    "delivery points, you get storage, handling and per-drop pricing in the same document.",
-    "We cover the whole country from 38 regional hubs. Major cities are on daily routes; smaller towns and "
-    "rural delivery points are served two or three times a week, depending on the channel.",
-    "Yes. Warehousing, fulfilment, delivery and retail execution are priced separately, so you can start "
-    "with storage only and add the rest when your volumes justify it.",
-    "Your SKU list with dimensions and weights, storage conditions, average and peak monthly volumes, the "
-    "delivery points you need covered and your order cut-off times. That is enough for a firm plan.",
+    "Retail and dental products. On the retail side: food and beverage, household and personal care, "
+    "and health and beauty lines sold through the large store chains. On the dental side: materials, "
+    "consumables and equipment for practices, clinics and laboratories.",
+    "Send us your range and your monthly production capacity. We tell you which chains we can "
+    "realistically place it in, at what volume and on what timeline. If we agree it fits, we buy the "
+    "first order and take it to the buyer ourselves.",
+    "The country's largest supermarket, drugstore, convenience and cash-and-carry chains, the "
+    "independent stores on our delivery routes, and dental practices, clinics, laboratories and "
+    "dental depots nationwide.",
+    "Nothing. We are not a logistics supplier and we do not invoice the brands we carry. We buy your "
+    "product and earn from distributing it, so there are no listing fees, storage charges or delivery "
+    "costs coming back to you.",
+    "Your product list with pack sizes, barcodes and shelf life, your production capacity per month, "
+    "any listings or exclusivity you already hold, and the certifications your category requires. "
+    "That is enough for us to walk into a buyer meeting.",
 ]
+
+# Nu facturam brandurile pe care le distribuim, deci cardurile de pret ale
+# sablonului devin niveluri de parteneriat, fara sume.
+PRICING_TIERS = ["Market Entry", "National Retail", "Full Category Partnership"]
 
 NAV_LOGO = ('<a href="index.html" class="brand-link g-inline-block" aria-label="GDH — Global Distribution '
             'Holdings, home">{logo}</a>')
@@ -170,7 +178,7 @@ def head_common(page, title, desc, og_type="website"):
         '<link rel="icon" href="/img/icon-16.png" type="image/png" sizes="16x16">'
         '<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">'
         '<link rel="manifest" href="/site.webmanifest">'
-        '<meta name="theme-color" content="#e01021">'
+        '<meta name="theme-color" content="#db020d">'
         '<meta name="application-name" content="GDH">'
         '<meta name="apple-mobile-web-app-title" content="GDH">'
         '<meta name="color-scheme" content="light">'
@@ -308,9 +316,105 @@ def body_rewrite(doc, logo_nav, logo_footer, logo_nav_ink=None):
         doc = re.sub(r'(<section class="section)', r'<span id="gdh-main" tabindex="-1"></span>\1',
                      doc, count=1)
 
+    # adresele vechi din snapshot -> numele noi, inainte de rewrite_cards,
+    # care potriveste cardurile dupa pagina spre care duc
+    import inner_gdh as I
+    for was, now in I.RENAME.items():
+        doc = doc.replace('href="%s"' % was, 'href="%s"' % now)
+
+    doc = rewrite_pricing(doc)
+    doc = rewrite_cards(doc)
+
     # scripturi proprii
     doc = doc.replace("</body>", SCRIPTS + "</body>")
     return doc
+
+
+def rewrite_cards(doc):
+    """Titlurile, rezumatele, etichetele si datele de pe cardurile din liste.
+
+    In sablon aceleasi siruri apar in mai multe locuri — titlul unui card de
+    client coincide cu titlul unui card de serviciu, doua carduri au acelasi
+    text, etichetele de sector sunt identice pe toate cardurile, iar datele din
+    liste au ramas din 2023 desi articolele sunt din 2026. Potrivirea pe text nu
+    le poate separa, deci luam fiecare camp dupa pagina spre care duce cardul,
+    din aceeasi sursa care scrie si pagina respectiva.
+
+    Listele au doua variante de card, cu clase diferite pentru aceleasi campuri;
+    le dam pe amandoua, iar cea care lipseste dintr-un card ramane fara efect.
+    """
+    import inner_gdh as I
+
+    slots = {}
+    for fn, (title, sector, lead, _items) in I.CASES.items():
+        slots[fn] = [("case-card-title", 0, title),
+                     ("project-name", 0, title),
+                     ("project-summary", 0, lead),
+                     ("font-1-extra-small", 0, sector),
+                     ("font-1-extra-small", 1, "Distribution")]
+    for fn, (_cat, date, title, _paras) in I.POSTS.items():
+        slots[fn] = [("blog-date-text", 0, date),
+                     ("font-1-extra-small(?: is-white)? medium", 0, date),
+                     ("font-2-small", 0, title),
+                     ("blog-card-title(?: is-white)?", 0, title)]
+
+    def put(seg, cls, nth, value):
+        hits = list(re.finditer(r'<(\w+) class="%s">([^<]*)</\1>' % cls, seg))
+        if nth >= len(hits):
+            return seg
+        m = hits[nth]
+        return seg[:m.start(2)] + esc(value) + seg[m.end(2):]
+
+    def card_end(i):
+        """Sfarsitul elementului <a> care contine link-ul de la pozitia i.
+
+        Fara limita asta, un card ar inghiti tot ce urmeaza pana la urmatorul
+        link — inclusiv sectiunea de parteneriat, careia i-ar rescrie numele
+        nivelurilor.
+        """
+        pat = re.compile(r"<(/?)a\b", re.I)
+        depth, pos = 0, doc.rfind("<a", 0, i)
+        while True:
+            m = pat.search(doc, pos)
+            if not m:
+                return len(doc)
+            depth += -1 if m.group(1) else 1
+            pos = m.end()
+            if depth == 0:
+                return pos
+
+    hits = list(re.finditer(r'href="((?:case|post)-[^"]+)"', doc))
+    # de la coada spre cap, ca pozitiile deja gasite sa ramana valide
+    for i in range(len(hits) - 1, -1, -1):
+        m = hits[i]
+        if m.group(1) not in slots:
+            continue
+        stop = card_end(m.start())
+        seg = doc[m.end():stop]
+        for cls, nth, value in slots[m.group(1)]:
+            seg = put(seg, cls, nth, value)
+        doc = doc[:m.end()] + seg + doc[stop:]
+    return doc
+
+
+def rewrite_pricing(doc):
+    """Numele nivelurilor din cardurile de pret.
+
+    Numele nivelului 2 coincide in snapshot cu titlul unui card de serviciu, deci
+    nu poate fi schimbat prin apply_copy fara sa il mute si pe celalalt: il luam
+    aici, dupa pozitie. Sumele sunt siruri unice si se schimba in copy_gdh.
+    """
+    idx = [0]
+
+    def tier(m):
+        i = idx[0]
+        idx[0] += 1
+        if i >= len(PRICING_TIERS):
+            return m.group(0)
+        return m.group(1) + esc(PRICING_TIERS[i]) + m.group(3)
+
+    return re.sub(r'(<div class="font-1-extra-small[^"]*">)([^<]*)(</div>'
+                  r'<div class="pricing-card-bottom">)', tier, doc)
 
 
 def fetch_remote(src, out, img_map):

@@ -1,51 +1,63 @@
 # Sursele site-ului GDH
 
-Branch-ul `source` din repo-ul `ghbr`. Aici stau fișierele **din care se generează**
-site-ul; site-ul propriu-zis e pe branch-ul `main` și doar acela ajunge pe Cloudflare.
+Un singur repo, o singura ramura: `main` din `alexbarciog/gdh`. Aici stau si
+fisierele **din care se genereaza** site-ul, si site-ul gata facut (`dist/`).
 
-    main    -> site-ul gata (folderul dist)   -> Cloudflare Pages publica asta
-    source  -> scripturile si textele         -> nu se publica niciodata
+    .                 -> scripturile, textele, snapshot-ul Webflow
+    dist/             -> site-ul gata, asta publica Cloudflare Pages
 
-## Ce e fiecare fișier
+## Ce e fiecare fisier
 
-| Fișier | Ce face |
+| Fisier | Ce face |
 |---|---|
-| `build_gdh.py` | scriptul principal: rulează toate etapele, în ordine |
+| `build_gdh.py` | scriptul principal: ruleaza toate etapele, in ordine |
 | `copy_gdh.py` | **toate textele** site-ului + `SITE_URL` (domeniul) |
-| `pages_gdh.py` | curăță paginile din snapshot: scoate Webflow, pune sigla, antetul |
-| `inner_gdh.py` | paginile scrise de la zero (about, servicii, studii de caz, articole) |
-| `logo_gdh.py` | pregătește sigla din `gdh-logo-source.png` |
-| `assets_gdh.py` | iconițele, imaginea de partajare, manifestul |
+| `pages_gdh.py` | curata paginile din snapshot: scoate Webflow, pune sigla, antetul |
+| `inner_gdh.py` | paginile scrise de la zero + harta `RENAME` a adreselor |
+| `logo_gdh.py` | pregateste sigla din `gdh-logo-source.png` |
+| `assets_gdh.py` | iconitele, imaginea de partajare, manifestul |
 | `site_js.js` | meniu, slidere, FAQ, formulare |
-| `animations_js.js` | animațiile pe GSAP |
-| `gdh-logo-source.png` | sigla originală, așa cum a fost primită |
-| `*_files/` | snapshot-ul Webflow original, materia primă |
+| `animations_js.js` | animatiile pe GSAP |
+| `gdh-logo-source.png` | sigla originala, asa cum a fost primita |
+| `*_files/` | snapshot-ul Webflow original, materia prima |
 
 ## Cum reconstruiesc site-ul
 
-    python build_gdh.py
+Are nevoie de Pillow si fontTools:
 
-Scrie peste folderul `dist`, fără să atingă `.git`-ul lui. Apoi, din `dist`:
+    python3 -m pip install --user pillow fonttools
+    python3 build_gdh.py
+
+Scrie peste folderul `dist`. Fara fontTools, etapa 8 crapa **dupa** ce `dist` a
+fost deja golit, si raman lipsa favicon-ul si imaginea de partajare.
+
+Apoi, din radacina:
 
     git add -A && git commit -m "..." && git push
 
 ## Cum public pe Cloudflare
 
-Proiectul Pages `gdh` e creat prin upload direct, iar ramura lui de producție se
-numește `gbh` (o scăpare de tastare la creare). Deci publicarea se face **exact**
-cu numele ăla, altfel deploy-ul intră ca preview și adresa principală nu se
-schimbă. Din folderul `dist`:
+Proiectul Pages e legat la acest repo:
+
+- Framework preset: **None**
+- Build command: **(gol)**
+- Build output directory: **dist**
+
+Fiecare push pe `main` redeployeaza singur. Pentru o publicare manuala, din `dist`:
 
     npx wrangler pages deploy . --project-name gdh --branch gbh --commit-dirty=true
 
-Adresa: https://gdh-4ns.pages.dev
+Ramura de productie a proiectului Pages se numeste `gbh` (o scapare de tastare la
+creare), deci numele ala trebuie folosit exact, altfel deploy-ul intra ca preview.
 
 ## Cum modific ceva
 
-- **texte** → `copy_gdh.py` (dicționarul `EXACT`, potrivire pe text integral)
-- **domeniu** → `SITE_URL` din `copy_gdh.py`, de acolo se iau canonical, og:url, sitemap
-- **pagini interioare** → `inner_gdh.py`
-- **culori, spații, siglă în CSS** → blocul de la finalul lui `build_gdh.py`
-- **animații** → `animations_js.js`
+- **texte** -> `copy_gdh.py` (dictionarul `EXACT`, potrivire pe text integral)
+- **domeniu** -> `SITE_URL` din `copy_gdh.py`, de acolo se iau canonical, og:url, sitemap
+- **pagini interioare** -> `inner_gdh.py`
+- **adresa unei pagini** -> `RENAME` din `inner_gdh.py`; vechea adresa ramane
+  valida, intra automat in `dist/_redirects`
+- **culori, spatii, sigla in CSS** -> blocul de la finalul lui `build_gdh.py`
+- **animatii** -> `animations_js.js`
 
-Nu edita direct fișierele din `dist`: se rescriu la fiecare build.
+Nu edita direct fisierele din `dist`: se rescriu la fiecare build.

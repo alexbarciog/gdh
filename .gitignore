@@ -1,9 +1,10 @@
-# dist e site-ul generat si are propriul repo (branch-ul main)
-dist/
-
 # cache de descarcare pentru fonturi si imagini aduse de la CDN
 .dlcache/
+
+# starea locala a wrangler-ului, nu are ce cauta in repo
+dist/.wrangler/
 
 __pycache__/
 *.pyc
 _*.png
+.DS_Store
