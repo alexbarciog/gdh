@@ -128,7 +128,10 @@ def build_brand_assets():
 def load_pages_data():
     try:
         import pages_data_gdh
-        return pages_data_gdh.PAGES
+        pages = pages_data_gdh.PAGES
+        for i, entry in enumerate(pages):
+            entry["rhythm"] = i % 3
+        return pages
     except Exception as e:                       # pragma: no cover
         log("  ! pages_data_gdh lipseste (%s) — se construiesc doar paginile scrise" % e)
         return []

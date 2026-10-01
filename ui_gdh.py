@@ -311,3 +311,48 @@ def cta_band(title, text, primary, secondary=None):
             '<div><h2 class="h1">%s</h2><p class="lede" style="margin-top:16px">%s</p></div>'
             '<div>%s</div></div>'
             % (rich(title), rich(text), btn_row(primary, secondary)))
+
+
+# ---------------------------------------------------------------- treatments
+def lead_say(text):
+    """Prima sectiune, ca declaratie: text mare, fara titlu, cu o linie dedesubt."""
+    return ('<p class="lead-say">%s</p><div class="lead-rule" aria-hidden="true"></div>'
+            % rich(text))
+
+
+def steps(items):
+    """Sectiuni numerotate, cu linii intre ele."""
+    rows = []
+    for i, (heading, body) in enumerate(items, 1):
+        rows.append('<div class="step"><div class="step__num">%02d</div>'
+                    '<div><h3>%s</h3><p class="muted">%s</p></div></div>'
+                    % (i, esc(heading), rich(body)))
+    return '<div class="steps">%s</div>' % "".join(rows)
+
+
+def statement(kicker, text):
+    """O singura fraza, mare, pe banda de gradient."""
+    return '%s<p>%s</p>' % (eyebrow(kicker), rich(text))
+
+
+def two_col(items):
+    """Proza pe doua coloane, pentru blocurile dense."""
+    body = "".join('<div><h2 class="h2" style="margin-bottom:10px">%s</h2>'
+                   '<p class="muted">%s</p></div>' % (esc(h), rich(b))
+                   for h, b in items)
+    return '<div class="prose prose--two">%s</div>' % body
+
+
+def facts(items):
+    """Fisele scurte, incadrate, cu linie de gradient sus."""
+    return '<div class="facts">%s</div>' % "".join(
+        '<div class="fact"><h3>%s</h3><p class="muted">%s</p></div>'
+        % (esc(it["title"]), esc(it["text"])) for it in items)
+
+
+def related(items):
+    """Trei pagini vecine, ca sa nu se termine fiecare pagina in acelasi zid."""
+    return '<div class="related">%s</div>' % "".join(
+        '<a href="%s"><span class="related__label">%s</span>'
+        '<span class="related__desc">%s</span></a>' % (esc(href), esc(label), esc(desc))
+        for label, href, desc in items)

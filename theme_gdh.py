@@ -366,6 +366,58 @@ a.tile:hover{{border-left-color:var(--accent);background:#fff;
   .split--reverse .split__media{{order:0}}
 }}
 
+/* ============================================================ treatments
+   Paginile de sector si de serviciu au acelasi model de continut, deci daca
+   randam mereu la fel ies identice. Astea sunt formele din care se compune
+   ritmul fiecarei pagini. */
+
+/* declaratia de deschidere: primul paragraf, mare, fara titlu */
+.lead-say{{font-size:clamp(1.35rem,2.1vw,1.75rem);line-height:1.45;font-weight:500;
+  max-width:46ch;color:var(--ink)}}
+.lead-rule{{margin-top:var(--s-4);height:4px;width:140px;
+  background:url(../img/gradient.webp) center/cover no-repeat}}
+
+/* pasi numerotati */
+.step{{display:grid;grid-template-columns:5.5rem 1fr;gap:var(--s-4);
+  padding-block:var(--s-4);border-top:1px solid var(--g200)}}
+.step:last-child{{border-bottom:1px solid var(--g200)}}
+.step__num{{font-size:1.6rem;font-weight:700;line-height:1.1;color:var(--accent);
+  font-variant-numeric:tabular-nums}}
+.step h3{{font-size:1.2rem;font-weight:700;margin-bottom:10px}}
+@media (max-width:640px){{
+  .step{{grid-template-columns:1fr;gap:10px}}
+}}
+
+/* banda de accent, cu o singura fraza */
+.statement{{background:var(--ink) url(../img/gradient.webp) center/cover no-repeat;
+  color:#fff}}
+.statement p{{font-size:clamp(1.4rem,2.6vw,2.05rem);line-height:1.32;font-weight:600;
+  max-width:26ch}}
+.statement .eyebrow{{color:rgba(255,255,255,.82)}}
+
+/* proza pe doua coloane */
+.prose--two{{max-width:none;columns:2;column-gap:var(--s-6)}}
+.prose--two > div{{break-inside:avoid;margin-bottom:var(--s-4)}}
+@media (max-width:860px){{.prose--two{{columns:1}}}}
+
+/* fise incadrate, cu linie de gradient sus */
+.facts{{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-3)}}
+.fact{{border:1px solid var(--g100);padding:var(--s-3);position:relative}}
+.fact::before{{content:"";position:absolute;left:0;right:0;top:0;height:4px;
+  background:url(../img/gradient.webp) center/cover no-repeat}}
+.fact h3{{font-size:1.05rem;font-weight:700;margin-bottom:8px}}
+@media (max-width:860px){{.facts{{grid-template-columns:1fr}}}}
+
+/* pagini inrudite */
+.related{{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--g100)}}
+.related a{{background:#fff;padding:var(--s-3);display:flex;flex-direction:column;
+  gap:8px;transition:background .2s,color .2s}}
+.related a:hover{{background:var(--ink);color:#fff}}
+.related a:hover .related__desc{{color:rgba(255,255,255,.75)}}
+.related__label{{font-weight:700}}
+.related__desc{{color:var(--g700);font-size:.95rem;line-height:1.45}}
+@media (max-width:860px){{.related{{grid-template-columns:1fr}}}}
+
 /* ============================================================ accordion */
 .acc__item{{border-bottom:1px solid var(--g200)}}
 .acc__top{{display:flex;justify-content:space-between;align-items:center;gap:var(--s-3);

@@ -285,28 +285,84 @@ def home():
 
 
 # ------------------------------------------------- sector / service pages
+def siblings(slug, limit=3):
+    """Pagini vecine din aceeasi sectiune de meniu, pentru blocul de la final."""
+    for group in C.NAV:
+        items = group.get("items") or []
+        hrefs = [h for _l, h, _d in items]
+        if slug + ".html" not in hrefs:
+            continue
+        others = [(l, h, d) for l, h, d in items if h != slug + ".html"]
+        if not others:
+            return []
+        # pornim din dreptul paginii curente, ca fiecare pagina sa arate alti vecini
+        start = hrefs.index(slug + ".html")
+        rotated = others[start % len(others):] + others[:start % len(others)]
+        return rotated[:limit]
+    return []
+
+
 def data_page(entry, current):
+    """O pagina de sector sau de serviciu.
+
+    Continutul are aceeasi forma peste tot — sectiuni, fise, intrebari — deci
+    daca il randam mereu la fel ies pagini identice. Alegem unul din trei
+    ritmuri, dupa pozitia paginii, ca doua pagini vecine sa nu arate la fel.
+    """
     page = entry["slug"] + ".html"
     trail = [("Home", "index.html"), (entry["kicker"], page)]
+    secs = [(x["heading"], x["body"]) for x in entry["sections"]]
+    shot = img(page)
+    rhythm = entry.get("rhythm", 0)
+
     body = U.pagehead(trail, entry["kicker"], entry["title"], entry["lede"],
                       [U.btn("Partner with us", "partner-with-us.html"),
-                       U.btn("Contact sales", "contact.html", "on-dark")],
-                      image=img(page))
-    body += U.section(U.prose_blocks([(s["heading"], s["body"]) for s in entry["sections"]]))
+                       U.btn("Contact sales", "contact-sales.html", "on-dark")],
+                      image=shot)
+
+    def spread(items, reverse=False):
+        """Text langa fotografie; fara fotografie, proza pe doua coloane."""
+        if shot and items:
+            h, b = items[0]
+            return U.split(h, [b], image=shot, reverse=reverse)
+        return U.two_col(items)
+
+    if rhythm == 0:
+        body += U.section(U.lead_say(secs[0][1]), tight=True)
+        body += U.section(spread(secs[1:2]), variant="grey")
+        if len(secs) > 2:
+            body += '<section class="section section--tight statement"><div class="wrap">%s</div></section>' \
+                    % U.statement(entry["kicker"], secs[2][1])
+        if len(secs) > 3:
+            body += U.section(U.two_col(secs[3:]))
+    elif rhythm == 1:
+        body += U.section(U.steps(secs[:3]))
+        if len(secs) > 3:
+            body += '<section class="section section--tight statement"><div class="wrap">%s</div></section>' \
+                    % U.statement(entry["kicker"], secs[3][1])
+        if len(secs) > 4:
+            body += U.section(spread(secs[4:5], reverse=True), variant="grey")
+    else:
+        body += U.section(U.lead_say(secs[0][1]), tight=True)
+        body += U.section(U.two_col(secs[1:3]), variant="grey")
+        if len(secs) > 3:
+            body += U.section(U.prose_blocks(secs[3:4]), variant="ink", tight=True)
+        if len(secs) > 4:
+            body += U.section(spread(secs[4:5]))
+
     if entry.get("bullets"):
-        body += U.section(
-            U.head_block("", "In practice.")
-            + '<div class="grid grid--3">%s</div>' % "".join(
-                '<div class="tile"><h3 class="h3">%s</h3>'
-                '<p class="muted" style="margin-top:10px">%s</p></div>'
-                % (U.esc(b["title"]), U.esc(b["text"])) for b in entry["bullets"]),
-            variant="grey")
+        body += U.section(U.head_block("", "In practice.") + U.facts(entry["bullets"]),
+                          variant="" if rhythm == 1 else "grey")
     body += faq_section(entry.get("faq", []))
+
+    near = siblings(entry["slug"])
+    if near:
+        body += U.section(U.head_block("", "Next door.") + U.related(near), tight=True)
+
     body += cta_section("Send us your range.",
                         "We will tell you honestly where it fits and how fast we can start.")
     return shell(page, page_title(entry["title"]),
-                 meta_desc(entry["lede"], [(x["heading"], x["body"]) for x in entry["sections"]]),
-                 body, current)
+                 meta_desc(entry["lede"], secs), body, current)
 
 
 # ----------------------------------------------------------- listing pages
