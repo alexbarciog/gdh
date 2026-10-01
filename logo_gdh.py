@@ -11,6 +11,7 @@ from PIL import Image
 
 RED_MIN = 90            # peste atât pe roșu și sub restul => e roșul siglei
 DARK_MAX = 90           # sub atât pe toate canalele => e tușul negru
+SATURATED = 40          # diferență între canale peste care pixelul e „colorat”
 
 
 def trim(im):
@@ -19,7 +20,13 @@ def trim(im):
 
 
 def recolor_ink(im, ink=(255, 255, 255)):
-    """Negrul din siglă devine altă culoare; roșul rămâne neatins."""
+    """Tusul inchis devine alta culoare; culoarea siglei ramane neatinsa.
+
+    Testul nu mai e "e rosu?", ci "e lipsit de culoare?". Sigla veche avea un
+    singur accent rosu, asa ca mergea sa cautam rosul; cea noua e un degrade
+    care trece prin turcoaz, albastru si magenta, iar un test pe rosu ar fi
+    spalat jumatate din litere spre alb pe fundal inchis.
+    """
     out = im.copy()
     px = out.load()
     w, h = out.size
@@ -28,14 +35,16 @@ def recolor_ink(im, ink=(255, 255, 255)):
             r, g, b, a = px[x, y]
             if a == 0:
                 continue
-            if r < DARK_MAX and g < DARK_MAX and b < DARK_MAX:
+            hi, lo = max(r, g, b), min(r, g, b)
+            chroma = hi - lo
+            if chroma > SATURATED:
+                continue                      # orice pixel colorat ramane cum e
+            if hi < DARK_MAX:
                 px[x, y] = (ink[0], ink[1], ink[2], a)
-            elif r > RED_MIN and g < DARK_MAX and b < DARK_MAX:
-                continue                      # roșul brandului
             else:
-                # muchiile antialiasate: amestecă spre noua culoare, proporțional
-                # cu cât de întunecat era pixelul
-                k = 1.0 - (max(r, g, b) / 255.0)
+                # muchiile antialiasate, gri: amesteca spre noua culoare,
+                # proportional cu cat de inchis era pixelul
+                k = 1.0 - (hi / 255.0)
                 px[x, y] = (int(r + (ink[0] - r) * k),
                             int(g + (ink[1] - g) * k),
                             int(b + (ink[2] - b) * k), a)
