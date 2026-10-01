@@ -143,23 +143,24 @@ ul,ol{{padding:0;list-style:none}}
 .section--ink .stat__label{{color:rgba(255,255,255,.72)}}
 
 /* ============================================================ buttons */
-.btn{{display:inline-flex;align-items:center;gap:12px;border:2px solid transparent;
-  padding:15px 30px;font-size:.88rem;font-weight:700;letter-spacing:.08em;
+.btn{{display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid transparent;padding:12px 24px;
+  font-size:.875rem;font-weight:700;line-height:1.3;letter-spacing:.1em;
   text-transform:uppercase;cursor:pointer;white-space:nowrap;
-  transition:background .2s,color .2s,border-color .2s}}
-/* sageata e un SVG fara dimensiuni proprii: fara asta se intinde cat tot butonul */
-.btn svg{{width:15px;height:15px;flex:none}}
-.btn--primary{{background:var(--accent);color:#fff;border-color:var(--accent)}}
-.btn--primary:hover{{background:var(--accent-dark);border-color:var(--accent-dark)}}
+  transition:background .2s,color .2s,border-color .2s,filter .2s}}
+.btn--primary{{color:#fff;border-color:transparent;
+  background:linear-gradient(75deg,var(--accent),var(--accent-bright),
+  var(--accent-bright),var(--accent))}}
+.btn--primary:hover{{filter:brightness(1.08)}}
 .btn--ghost{{background:transparent;color:var(--ink);border-color:var(--ink)}}
-/* butonul secundar: degradeul de turcoaz din limbajul-sursa, la 75 de grade */
+.btn--ghost:hover{{background:var(--ink);color:#fff}}
+.btn--on-dark{{background:transparent;color:#fff;border-color:#fff}}
+.btn--on-dark:hover{{background:#fff;color:var(--ink)}}
+/* pastrat ca alias: butonul principal poarta deja degradeul */
 .btn--grad{{color:#fff;border-color:transparent;
   background:linear-gradient(75deg,var(--accent),var(--accent-bright),
   var(--accent-bright),var(--accent))}}
 .btn--grad:hover{{filter:brightness(1.08)}}
-.btn--ghost:hover{{background:var(--ink);color:#fff}}
-.btn--on-dark{{background:transparent;color:#fff;border-color:rgba(255,255,255,.55)}}
-.btn--on-dark:hover{{background:#fff;color:var(--ink);border-color:#fff}}
 .btn-row{{display:flex;flex-wrap:wrap;gap:var(--s-2);margin-top:var(--s-4)}}
 .link-arrow{{display:inline-flex;align-items:center;gap:10px;font-weight:700;
   font-size:.9rem;letter-spacing:.04em;border-bottom:2px solid var(--accent);
@@ -186,9 +187,12 @@ ul,ol{{padding:0;list-style:none}}
 .header .wrap{{transition:min-height .25s ease}}
 /* dupa ce pagina a plecat de sus, antetul se strange putin si capata umbra */
 .chrome.is-scrolled .header{{box-shadow:0 10px 30px rgba(0,0,0,.08)}}
-.chrome.is-scrolled .header .wrap{{min-height:62px}}
+.chrome.is-scrolled .header > .wrap{{min-height:62px}}
 .chrome.is-scrolled .nav__link{{padding-block:21px}}
-.header .wrap{{display:flex;align-items:center;justify-content:space-between;
+/* numai containerul propriu al antetului, nu si cel din panoul de meniu:
+   panoul traieste in interiorul <header>, iar fara `>` mostenea display:flex
+   si grila lui se strangea la latimea continutului */
+.header > .wrap{{display:flex;align-items:center;justify-content:space-between;
   gap:var(--s-4);min-height:76px}}
 .brand img{{height:40px;width:auto}}
 .nav{{display:flex;align-items:center;gap:var(--s-4)}}
@@ -200,24 +204,56 @@ ul,ol{{padding:0;list-style:none}}
 .nav__cta{{margin-left:var(--s-2)}}
 @media (max-width:1080px){{.nav,.nav__cta{{display:none}}}}
 
-/* mega-meniu */
-.mega{{position:absolute;left:0;right:0;top:100%;background:#fff;
-  border-top:1px solid var(--g100);box-shadow:0 24px 48px rgba(0,0,0,.09);
-  display:none}}
+/* mega-meniu: panou pe toata latimea, pe fundal de gradient */
+.mega{{position:absolute;left:0;right:0;top:100%;display:none;color:#fff;
+  background:var(--ink) url(../img/gradient.webp) center/cover no-repeat;
+  max-height:calc(100vh - var(--chrome-h,123px));overflow-y:auto;
+  box-shadow:0 30px 60px rgba(0,0,0,.28)}}
 .mega.is-open{{display:block}}
-/* Coloane explicite, nu auto-fit: cu auto-fit grila se stranjea la o singura
-   banda de 170 px in loc sa umple randul, si meniul iesea pe o coloana
-   ingusta, inalta cat pagina. Varianta ingusta vine din media query. */
-.mega__inner{{display:grid;width:100%;grid-template-columns:repeat(4,1fr);
-  gap:var(--s-5);padding-block:var(--s-5)}}
+.mega .wrap{{padding-block:var(--s-5) var(--s-6)}}
+.mega__top{{display:flex;justify-content:space-between;align-items:flex-start;
+  gap:var(--s-4);margin-bottom:var(--s-6)}}
+.mega__eyebrow{{font-size:.9rem;color:rgba(255,255,255,.72);margin-bottom:6px}}
+.mega__title{{font-size:clamp(1.8rem,2.8vw,2.5rem);font-weight:700;line-height:1.2}}
+.mega__close{{display:inline-flex;align-items:center;gap:10px;background:none;
+  border:0;color:#fff;cursor:pointer;font-size:.8rem;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;padding:6px}}
+.mega__close:hover{{opacity:.72}}
+.mega__grid{{display:grid;width:100%;grid-template-columns:repeat(4,1fr);
+  gap:var(--s-5) var(--s-4)}}
+.mega__item{{display:block}}
+.mega__label{{display:block;font-size:.9rem;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase}}
+.mega__chev{{display:inline-block;margin-right:8px;transition:transform .2s}}
+.mega__item:hover .mega__chev{{transform:translateX(4px)}}
+.mega__item:hover .mega__label{{text-decoration:underline;text-underline-offset:4px}}
+.mega__desc{{display:block;margin-top:8px;font-size:.95rem;line-height:1.45;
+  color:rgba(255,255,255,.78);max-width:34ch}}
+.mega__cta{{display:block;margin-top:var(--s-6);padding:var(--s-3) var(--s-4);
+  border:1px solid rgba(255,255,255,.5);max-width:46rem;transition:background .2s}}
+.mega__cta:hover{{background:rgba(255,255,255,.1)}}
+.mega__cta-title{{display:inline-flex;align-items:center;gap:10px;font-weight:700;
+  font-size:1.05rem}}
+.mega__cta-title svg{{width:15px;height:15px;flex:none}}
+.mega__cta-text{{display:block;margin-top:6px;color:rgba(255,255,255,.78);
+  font-size:.95rem}}
 @media (max-width:1240px){{
-  .mega__inner{{grid-template-columns:repeat(2,1fr);gap:var(--s-4)}}
+  .mega__grid{{grid-template-columns:repeat(2,1fr);gap:var(--s-4)}}
 }}
-.mega__col h3{{font-size:.78rem;font-weight:700;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--g700);margin-bottom:var(--s-2)}}
-.mega__col li + li{{margin-top:10px}}
-.mega__col a{{font-size:1rem;font-weight:500}}
-.mega__col a:hover{{color:var(--accent)}}
+
+/* cat timp panoul e deschis, antetul sta peste gradient */
+.brand{{position:relative;display:inline-flex}}
+.brand__light{{position:absolute;inset:0;opacity:0;transition:opacity .2s}}
+.chrome.mega-open .header{{background:transparent;border-bottom-color:transparent;
+  box-shadow:none}}
+.chrome.mega-open .nav__link{{color:#fff}}
+.chrome.mega-open .nav__link:hover,
+.chrome.mega-open .nav__link[aria-expanded="true"]{{color:#fff;opacity:.75}}
+.chrome.mega-open .brand__ink{{opacity:0}}
+.chrome.mega-open .brand__light{{opacity:1}}
+.chrome.mega-open .burger span,
+.chrome.mega-open .burger span::before,
+.chrome.mega-open .burger span::after{{background:#fff}}
 
 /* meniul de telefon */
 .burger{{display:none;width:48px;height:48px;align-items:center;justify-content:center;

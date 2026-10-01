@@ -31,12 +31,15 @@
     var openOne = null;
     var closeTimer = null;
 
+    var chrome = document.getElementById("gdh-chrome");
+
     function close() {
       if (!openOne) return;
       var panel = document.getElementById(openOne.getAttribute("data-mega"));
       if (panel) panel.classList.remove("is-open");
       openOne.setAttribute("aria-expanded", "false");
       openOne = null;
+      if (chrome) chrome.classList.remove("mega-open");
     }
     function open(trigger) {
       if (openOne === trigger) return;
@@ -46,6 +49,8 @@
       panel.classList.add("is-open");
       trigger.setAttribute("aria-expanded", "true");
       openOne = trigger;
+      // cat timp panoul e deschis, antetul sta peste gradient
+      if (chrome) chrome.classList.add("mega-open");
     }
     function hold() { window.clearTimeout(closeTimer); }
     function release() { closeTimer = window.setTimeout(close, 180); }
@@ -70,7 +75,14 @@
         if (mqDesktop.matches) { hold(); open(trigger); }
       });
       // focusul intrat in panou il tine deschis, ca sa se poata tabula prin el
-      if (panel) panel.addEventListener("focusin", hold);
+      if (panel) {
+        panel.addEventListener("focusin", hold);
+        var shut = panel.querySelector(".mega__close");
+        if (shut) shut.addEventListener("click", function () {
+          trigger.focus();
+          close();
+        });
+      }
     });
 
     document.addEventListener("keydown", function (e) {

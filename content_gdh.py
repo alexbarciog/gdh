@@ -13,44 +13,49 @@ PHONE = "+40 21 300 40 50"
 ADDRESS = ["Calea Lugojului nr 148", "CTPark", "307200 Ghiroda, România"]
 
 # --------------------------------------------------------------- navigatie
+# Descrierile de sub fiecare intrare din meniu. Cheia e pagina tinta.
+# Se completeaza din menu_data_gdh.py, generat citind paginile reale.
+try:
+    from menu_data_gdh import DESCRIPTIONS as MENU_DESC
+except ImportError:          # inainte de prima generare
+    MENU_DESC = {}
+
+
+def _item(label, href):
+    return (label, href, MENU_DESC.get(href, ""))
+
+
 NAV = [
-    dict(key="sectors", id="sectors", title="Sectors", href="sectors.html", columns=[
-        dict(title="Retail", links=[
-            ("Retail overview", "sector-retail.html"),
-            ("Grocery", "sector-grocery.html"),
-            ("Health & Beauty", "sector-health-beauty.html"),
-            ("Convenience", "sector-convenience.html"),
-            ("Private Label", "sector-private-label.html"),
-        ]),
-        dict(title="Dental", links=[
-            ("Dental overview", "sector-dental.html"),
-            ("Practices & Clinics", "sector-dental-practices.html"),
-            ("Laboratories", "sector-dental-laboratories.html"),
-        ]),
-        dict(title="Start here", links=[
-            ("Partner with us", "partner-with-us.html"),
-            ("Contact sales", "contact.html"),
-        ]),
-    ]),
+    dict(key="sectors", id="sectors", title="Sectors", href="sectors.html",
+         eyebrow="Sectors",
+         heading="The shelves we already supply",
+         items=[
+             _item("Overview", "sectors.html"),
+             _item("Retail", "sector-retail.html"),
+             _item("Grocery", "sector-grocery.html"),
+             _item("Health & Beauty", "sector-health-beauty.html"),
+             _item("Convenience", "sector-convenience.html"),
+             _item("Private label", "sector-private-label.html"),
+             _item("Dental", "sector-dental.html"),
+             _item("Practices & clinics", "sector-dental-practices.html"),
+             _item("Laboratories", "sector-dental-laboratories.html"),
+         ],
+         cta=("Contact sales", "Tell us what you make and which shelves it belongs on",
+              "contact-sales.html")),
     dict(key="distribution", id="distribution", title="Distribution",
-         href="distribution.html", columns=[
-        dict(title="What we do", links=[
-            ("Distribution overview", "distribution.html"),
-            ("Chain listings", "service-chain-listings.html"),
-            ("Stock & delivery", "service-stock-and-delivery.html"),
-        ]),
-        dict(title="In store", links=[
-            ("Shelf execution", "service-shelf-execution.html"),
-            ("Returns & recalls", "service-returns.html"),
-        ]),
-        dict(title="Data", links=[
-            ("Sell-out visibility", "service-sell-out-visibility.html"),
-        ]),
-        dict(title="Start here", links=[
-            ("Partner with us", "partner-with-us.html"),
-            ("Contact sales", "contact.html"),
-        ]),
-    ]),
+         href="distribution.html",
+         eyebrow="Distribution",
+         heading="From the factory gate to the shelf edge",
+         items=[
+             _item("Overview", "distribution.html"),
+             _item("Chain listings", "service-chain-listings.html"),
+             _item("Stock & delivery", "service-stock-and-delivery.html"),
+             _item("Shelf execution", "service-shelf-execution.html"),
+             _item("Sell-out visibility", "service-sell-out-visibility.html"),
+             _item("Returns & recalls", "service-returns.html"),
+         ],
+         cta=("Partner with us", "Send us your range and we will tell you where it fits",
+              "partner-with-us.html")),
     dict(key="insights", title="Insights", href="insights.html"),
     dict(key="about", title="About us", href="about-us.html"),
 ]

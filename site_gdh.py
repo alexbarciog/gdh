@@ -212,7 +212,7 @@ def home():
     h = C.HOME
     hero = U.hero(h["kicker"], h["title"], h["lede"],
                   [U.btn("Partner with us", "partner-with-us.html"),
-                   U.btn("What we do", "distribution.html", "grad")],
+                   U.btn("What we do", "distribution.html", "on-dark")],
                   image=img("index.html"))
 
     topics = U.section(
@@ -346,8 +346,8 @@ def contact_page():
         '<label class="field"><span>What do you make?</span>'
         '<textarea name="Message" required placeholder="Your range, your monthly capacity, '
         'and the chains or practices you want to reach."></textarea></label>'
-        '<button class="btn btn--primary" type="submit">Send message%s</button>'
-        '</form>' % U.ARROW)
+        '<button class="btn btn--primary" type="submit">Send message</button>'
+        '</form>')
     aside = (
         '<div>%s<h2 class="h2">Office</h2>'
         '<p class="muted" style="margin-top:12px">%s</p>'

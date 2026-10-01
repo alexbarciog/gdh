@@ -33,8 +33,9 @@ def eyebrow(text, muted=False):
 
 
 def btn(label, href, kind="primary"):
-    return ('<a class="btn btn--%s" href="%s">%s%s</a>'
-            % (kind, esc(href), esc(label), ARROW))
+    """Buton drept, cu eticheta cu majuscule. Fara sageata: in limbajul-sursa
+    butoanele sunt curate, iar sageata e rezervata link-urilor de tip text."""
+    return '<a class="btn btn--%s" href="%s">%s</a>' % (kind, esc(href), esc(label))
 
 
 def link_arrow(label, href):
@@ -64,15 +65,42 @@ def chrome(links, nav, logo_src, current=""):
             % (topbar(links), header(nav, logo_src, current)))
 
 
+CLOSE_ICON = ('<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" fill="none" '
+              'stroke="currentColor" stroke-width="2" stroke-linecap="round">'
+              '<path d="M4 4l12 12M16 4L4 16"/></svg>')
+
+
 def _mega(group):
-    cols = []
-    for col in group["columns"]:
-        li = "".join('<li><a href="%s">%s</a></li>' % (esc(h), esc(t))
-                     for t, h in col["links"])
-        cols.append('<div class="mega__col"><h3>%s</h3><ul>%s</ul></div>'
-                    % (esc(col["title"]), li))
-    return ('<div class="mega" id="mega-%s"><div class="wrap"><div class="mega__inner">%s'
-            '</div></div></div>' % (group["id"], "".join(cols)))
+    """Panoul mare al unei sectiuni din meniu.
+
+    Ocupa latimea paginii, are fundalul de gradient, un titlu, intrarile cu o
+    descriere sub fiecare, un buton de inchidere si un indemn incadrat jos.
+    """
+    items = "".join(
+        '<li><a class="mega__item" href="%s">'
+        '<span class="mega__label"><span class="mega__chev" aria-hidden="true">&rsaquo;</span>%s</span>'
+        '%s</a></li>'
+        % (esc(href), esc(label),
+           ('<span class="mega__desc">%s</span>' % esc(desc)) if desc else "")
+        for label, href, desc in group["items"])
+
+    cta = ""
+    if group.get("cta"):
+        c_label, c_text, c_href = group["cta"]
+        cta = ('<a class="mega__cta" href="%s"><span class="mega__cta-title">%s%s</span>'
+               '<span class="mega__cta-text">%s</span></a>'
+               % (esc(c_href), esc(c_label), ARROW, esc(c_text)))
+
+    return (
+        '<div class="mega" id="mega-%s"><div class="wrap">'
+        '<div class="mega__top"><div>%s<h2 class="mega__title">%s</h2></div>'
+        '<button class="mega__close" type="button">Close%s</button></div>'
+        '<ul class="mega__grid">%s</ul>%s'
+        '</div></div>'
+        % (group["id"],
+           '<p class="mega__eyebrow">%s</p>' % esc(group.get("eyebrow", group["title"])),
+           esc(group.get("heading", group["title"])),
+           CLOSE_ICON, items, cta))
 
 
 def header(nav, logo_src, current=""):
@@ -84,7 +112,7 @@ def header(nav, logo_src, current=""):
         # aria-current, nu doar o clasa de CSS: altfel pagina curenta nu e
         # anuntata de cititoarele de ecran
         mark = ' aria-current="page"' if here else ""
-        if group.get("columns"):
+        if group.get("items"):
             links.append('<a class="%s" href="%s"%s data-mega="mega-%s" '
                          'aria-expanded="false">%s</a>%s'
                          % (cls, esc(group["href"]), mark, group["id"],
@@ -96,33 +124,32 @@ def header(nav, logo_src, current=""):
         '<header class="header" id="gdh-header">'
         '<div class="wrap">'
         '<a class="brand" href="index.html" aria-label="GDH — Global Distribution Holdings, home">'
-        '<img src="%s" alt="GDH — Global Distribution Holdings" width="96" height="40" '
-        'decoding="async"></a>'
+        '<img class="brand__ink" src="%s" alt="GDH — Global Distribution Holdings" '
+        'width="96" height="40" decoding="async">'
+        '<img class="brand__light" src="img/gdh-logo-light.png" alt="" aria-hidden="true" '
+        'width="96" height="40" decoding="async">'
+        '</a>'
         '<nav class="nav" aria-label="Main">%s</nav>'
-        '<a class="btn btn--primary nav__cta" href="contact.html">Contact sales%s</a>'
+        '<a class="btn btn--primary nav__cta" href="contact.html">Contact sales</a>'
         '<button class="burger" type="button" aria-expanded="false" '
         'aria-controls="gdh-drawer" aria-label="Menu"><span></span></button>'
-        '</div></header>' % (esc(logo_src), "".join(links), ARROW))
+        '</div></header>' % (esc(logo_src), "".join(links)))
 
 
 def drawer(nav):
     groups = []
     for group in nav:
-        if group.get("columns"):
-            inner = []
-            for col in group["columns"]:
-                inner.append('<h3 class="card__meta">%s</h3><ul>%s</ul>'
-                             % (esc(col["title"]),
-                                "".join('<li><a href="%s">%s</a></li>' % (esc(h), esc(t))
-                                        for t, h in col["links"])))
-            pid = "drawer-%s" % group.get("id", group["title"].lower().replace(" ", "-"))
+        if group.get("items"):
+            pid = "drawer-%s" % group["id"]
+            links = "".join('<li><a href="%s">%s</a></li>' % (esc(href), esc(label))
+                            for label, href, _desc in group["items"])
             groups.append(
                 '<div class="drawer__group">'
                 '<button class="drawer__top" type="button" aria-expanded="false" '
                 'aria-controls="%s">%s'
                 '<span class="topics__arrow" aria-hidden="true">+</span></button>'
-                '<div class="drawer__panel" id="%s">%s</div></div>'
-                % (pid, esc(group["title"]), pid, "".join(inner)))
+                '<div class="drawer__panel" id="%s"><ul>%s</ul></div></div>'
+                % (pid, esc(group["title"]), pid, links))
         else:
             groups.append('<div class="drawer__group">'
                           '<a class="drawer__top" href="%s">%s</a></div>'
