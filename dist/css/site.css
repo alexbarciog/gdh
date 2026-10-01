@@ -241,8 +241,14 @@ ul,ol{padding:0;list-style:none}
   border-top:1px solid var(--g100);box-shadow:0 24px 48px rgba(0,0,0,.09);
   display:none}
 .mega.is-open{display:block}
-.mega__inner{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+/* Coloane explicite, nu auto-fit: cu auto-fit grila se stranjea la o singura
+   banda de 170 px in loc sa umple randul, si meniul iesea pe o coloana
+   ingusta, inalta cat pagina. Varianta ingusta vine din media query. */
+.mega__inner{display:grid;width:100%;grid-template-columns:repeat(4,1fr);
   gap:var(--s-5);padding-block:var(--s-5)}
+@media (max-width:1240px){
+  .mega__inner{grid-template-columns:repeat(2,1fr);gap:var(--s-4)}
+}
 .mega__col h3{font-size:.78rem;font-weight:700;letter-spacing:.12em;
   text-transform:uppercase;color:var(--g700);margin-bottom:var(--s-2)}
 .mega__col li + li{margin-top:10px}
