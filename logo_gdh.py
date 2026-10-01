@@ -14,8 +14,16 @@ DARK_MAX = 90           # sub atât pe toate canalele => e tușul negru
 SATURATED = 40          # diferență între canale peste care pixelul e „colorat”
 
 
-def trim(im):
-    bb = im.getbbox()
+def trim(im, alpha=128):
+    """Taie marginile goale.
+
+    Nu folosim getbbox(): el pastreaza si pixelii aproape transparenti, iar o
+    siglă exportata cu putin zgomot pe margini ramane cu randuri care arata
+    goale dar nu sunt, ceea ce incurca apoi cautarea benzii dintre marca si
+    descriptor. Taiem dupa o masca de opacitate reala.
+    """
+    mask = im.getchannel("A").point(lambda v: 255 if v >= alpha else 0)
+    bb = mask.getbbox()
     return im.crop(bb) if bb else im
 
 
@@ -77,7 +85,10 @@ def wordmark_only(im):
     w, h = im.size
     px = im.load()
     rows = [sum(1 for x in range(0, w, 2) if px[x, y][3] > 128) for y in range(h)]
-    gaps = _runs(rows, lambda n: n == 0)
+    # doar benzile goale dinauntrul desenului: una lipita de marginea de sus sau
+    # de jos nu desparte nimic, iar daca o alegem taiem sigla la inaltime zero
+    gaps = [g for g in _runs(rows, lambda n: n == 0)
+            if g[0] > 0 and g[0] + g[1] < h]
     if not gaps:
         return im
     cut = max(gaps, key=lambda g: g[1])[0]
@@ -113,9 +124,13 @@ def icon_from_mark(mark, size, pad=0.14, bg=(255, 255, 255), radius=0.22):
     return img.resize((size, size), Image.LANCZOS)
 
 
-def squeeze(im, colors=48):
-    """Sigla are trei culori plate: o paletă mică taie fișierul de câteva ori,
-    fără diferență vizibilă."""
+def squeeze(im, colors=256):
+    """Reduce paleta, fara sa se vada.
+
+    48 de culori ajungeau cand sigla avea trei culori plate. Pe un degrade
+    produc dungi clare pe litere, deci urcam la 256: diferenta de marime e sub
+    5 KB, iar trecerea ramane neteda.
+    """
     q = im.quantize(colors=colors, method=Image.FASTOCTREE)
     return q
 
