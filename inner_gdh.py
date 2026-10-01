@@ -359,7 +359,7 @@ CASES = {
 POSTS = {
     "post-what-a-chain-buyer-decides.html": (
         "Retail Strategy", "June 10, 2026",
-        "What a chain buyer is actually deciding when they look at your product",
+        "What a chain buyer is actually deciding",
         [("Brands prepare for a buyer meeting by talking about their product. Buyers are not deciding "
           "whether your product is good. They are deciding what comes off the shelf to make room for "
           "it, and whether the category earns more afterwards."),
@@ -382,7 +382,7 @@ POSTS = {
           "with a distributor whose people are already walking that aisle for other reasons.")]),
     "post-sell-out-not-sell-in.html": (
         "Data & Insight", "October 8, 2026",
-        "Sell-in tells you what you shipped. Only sell-out tells you anything useful.",
+        "Sell-in is not sell-out, and only one of them matters",
         [("Most producers manage their business on sell-in: what left the warehouse, what was invoiced, "
           "what the distributor ordered. It is the easiest number to get and the least informative one "
           "you can run on."),
@@ -426,7 +426,7 @@ POSTS = {
           "more common than most brands believe.")]),
     "post-the-dental-channel.html": (
         "Dental Channel", "October 4, 2026",
-        "The dental channel does not behave like retail, and treating it like retail fails",
+        "The dental channel does not behave like retail",
         [("Brands that succeed in retail often assume dentistry is the same game at a smaller scale. It "
           "is not. The order is small, frequent and clinically specific, and the person deciding is the "
           "person who will use the product on a patient that afternoon."),

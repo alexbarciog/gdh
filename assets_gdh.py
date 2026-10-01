@@ -8,22 +8,38 @@ import os, io, math
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
-RED = (254, 63, 3)      # vezi BRAND din build_gdh.py
+RED = (0, 118, 122)     # tonul de actiune; vezi TOKENS["accent"] din theme_gdh.py
 INK = (17, 17, 17)
 WHITE = (255, 255, 255)
 
 
 # ---------------------------------------------------------------- fonturi
 def load_fonts(out, cache):
-    """woff2 -> ttf, ca să putem desena cu adevăratul Inter Tight."""
+    """woff2 -> ttf, ca sa putem desena iconitele cu fontul real al site-ului.
+
+    Cauta ce exista in dist/fonts si potriveste grosimea cea mai apropiata, ca
+    sa nu depinda de un set fix de nume de fisiere.
+    """
     from fontTools.ttLib import TTFont
     os.makedirs(cache, exist_ok=True)
+    font_dir = os.path.join(out, "fonts")
+    found = {}
+    for fn in sorted(os.listdir(font_dir)):
+        if not fn.endswith(".woff2") or "latin-ext" in fn:
+            continue
+        digits = "".join(ch for ch in fn if ch.isdigit())
+        if not digits:
+            continue
+        found[int(digits[:3])] = os.path.join(font_dir, fn)
+    if not found:
+        raise RuntimeError("niciun font in %s" % font_dir)
+
     paths = {}
     for weight in (400, 500, 600, 700):
-        src = os.path.join(out, "fonts", "inter-tight-%d-latin.woff2" % weight)
-        dst = os.path.join(cache, "inter-tight-%d.ttf" % weight)
+        nearest = min(found, key=lambda w: abs(w - weight))
+        dst = os.path.join(cache, "gdh-%d-%d.ttf" % (weight, nearest))
         if not os.path.exists(dst):
-            f = TTFont(src)
+            f = TTFont(found[nearest])
             f.flavor = None
             f.save(dst)
         paths[weight] = dst
@@ -179,7 +195,7 @@ def build_manifest(out, name, short):
         "scope": "/",
         "display": "standalone",
         "background_color": "#0d0d0d",
-        "theme_color": "#fe3f03",
+        "theme_color": "#00767a",
         "icons": [
             {"src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png"},
             {"src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png"},

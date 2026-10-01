@@ -1,3 +1,4 @@
+/blog  /insights  301
 /case-study-e-commerce-logistics-excellence  /case-seasonal-promotion  301
 /case-study-e-commerce-logistics  /case-private-label  301
 /case-study-international-logistics  /case-market-entry  301
@@ -6,6 +7,7 @@
 /case-study-transportation-efficiency  /case-drugstore-chain-rollout  301
 /case-study-transportation-freight  /case-dental-equipment-distribution  301
 /case-study-warehousing-distribution  /case-convenience-chains  301
+/case-study  /brands  301
 /get-a-quote  /partner-with-us  301
 /post-e-commerce-logistics  /post-private-label  301
 /post-expert-tips-guides  /post-before-you-approach-a-chain  301
@@ -16,7 +18,10 @@
 /post-technology-digital-transformation  /post-the-dental-channel  301
 /post-warehouse-inventory-solutions  /post-what-a-chain-buyer-decides  301
 /service-clear-shipment-visibility  /service-sell-out-visibility  301
+/service-dental-distribution  /sector-dental  301
 /service-dispute-resolution-litigation  /service-shelf-execution  301
 /service-flexible-transport-options  /service-stock-and-delivery  301
-/service-one-of-the-best-accountable-team  /service-retail-chain-listings  301
-/service-scalable-capacity-with-shipment  /service-dental-distribution  301
+/service-one-of-the-best-accountable-team  /service-chain-listings  301
+/service-retail-chain-listings  /service-chain-listings  301
+/service-scalable-capacity-with-shipment  /sector-dental  301
+/service  /distribution  301
