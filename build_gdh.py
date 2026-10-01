@@ -24,6 +24,14 @@ PAGES = {
     "contact.html": "contact.html",
 }
 
+# Culoarea de brand, intr-un singur loc: de aici pleaca CSS-ul, theme-color,
+# iconitele si imaginea de partajare. Sablonul venea cu TEMPLATE_ORANGE, care
+# se inlocuieste peste tot cu BRAND.
+BRAND = "#fe3f03"
+BRAND_DARK = "#d23403"
+BRAND_RGB = (254, 63, 3)
+TEMPLATE_ORANGE = "fe3e02"
+
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126 Safari/537.36"}
 _cache = os.path.join(SRC, ".dlcache")
 
@@ -186,10 +194,10 @@ def build_css():
     css = re.sub(r"[^{}]*\.w-webflow-badge[^{}]*\{[^}]*\}", "", css)
     # rosul GDH in locul portocaliului din sablon, peste tot in CSS
     # si forma pe 8 cifre, cu alfa (#fe3e0280), nu doar cea pe 6
-    css = re.sub(r"#fe3e02([0-9a-f]{2})?\b", lambda m: "#db020d" + (m.group(1) or ""),
-                 css, flags=re.I)
-    css = re.sub(r"rgba?\(\s*254\s*,\s*62\s*,\s*2\s*", "rgba(219, 2, 13", css)
-    css = css.replace("#ffefe6", "#ffe9ea")   # tenta calda a insignei, acordata la rosu
+    css = re.sub(r"#%s([0-9a-f]{2})?\b" % TEMPLATE_ORANGE,
+                 lambda m: BRAND + (m.group(1) or ""), css, flags=re.I)
+    css = re.sub(r"rgba?\(\s*254\s*,\s*62\s*,\s*2\s*",
+                 "rgba(%d, %d, %d" % BRAND_RGB, css)
     css = w_rename(css)
     # familia proprie de fonturi, fara referinte la template
     css = css.replace("Generalsans", "GDH Sans")
@@ -199,7 +207,7 @@ def build_css():
 
     brand = """
 /* ---------- GDH brand ---------- */
-:root{--gdh-red:#db020d;--gdh-red-dark:#a80209;--gdh-ink:#111111;}
+:root{--gdh-red:__BRAND__;--gdh-red-dark:__BRAND_DARK__;--gdh-ink:#111111;}
 .gdh-logo{display:block;height:auto;width:auto;max-width:100%}
 .gdh-logo--nav{height:54px}
 .gdh-logo--footer{height:66px}
@@ -278,16 +286,19 @@ select:focus-visible,[tabindex]:focus-visible,.faq-top:focus-visible{
   .footer-link,.contact-link,.social-link,.navlink,.g-slider-dot{position:relative}
   .footer-link::after,.contact-link::after,.navlink::after{
     content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
-  /* sablonul pune max-height 1.5rem, deci nu ajunge doar height */
-  .social-link{width:44px;height:44px;max-height:44px;display:inline-flex;
-    align-items:center;justify-content:center}
-  .social-link .social-icon{width:24px;height:24px}
+  /* max-height 1.5rem nu e o scapare a sablonului, e masca: iconita e pusa de
+     doua ori, una sub alta, si se roteste la hover. Daca marim caseta, apare si
+     a doua — deci zona de atins vine dintr-un strat invizibil peste ea. */
+  .social-link::after{content:"";position:absolute;left:50%;top:50%;
+    width:44px;height:44px;transform:translate(-50%,-50%)}
   .service-slide-button,.review-slide-button{min-width:44px;min-height:44px;
     display:inline-flex;align-items:center;justify-content:center}
   .g-slider-dot{width:12px;height:12px}
   .g-slider-dot::after{content:"";position:absolute;inset:-16px}
 }
 """
+    # blocul are procente in el (100%, 50%), deci nu se poate formata cu %
+    brand = brand.replace("__BRAND__", BRAND).replace("__BRAND_DARK__", BRAND_DARK)
     open(os.path.join(OUT, "css", "site.css"), "w", encoding="utf-8").write(css + brand)
 
 
@@ -389,8 +400,10 @@ def finalize():
         "form-action 'self'; frame-ancestors 'self'; base-uri 'self'\n"
         "\n/img/*\n  Cache-Control: public, max-age=31536000, immutable\n"
         "\n/fonts/*\n  Cache-Control: public, max-age=31536000, immutable\n"
-        "\n/css/*\n  Cache-Control: public, max-age=604800\n"
-        "\n/js/*\n  Cache-Control: public, max-age=604800\n")
+        # numele css/js poarta amprenta continutului, deci pot fi cache-uite la fel
+        # de agresiv ca imaginile: un build nou aduce un nume nou
+        "\n/css/*\n  Cache-Control: public, max-age=31536000, immutable\n"
+        "\n/js/*\n  Cache-Control: public, max-age=31536000, immutable\n")
     # adresele vechi raman valide: Cloudflare Pages citeste _redirects
     import inner_gdh as _I
     open(os.path.join(OUT, "_redirects"), "w", encoding="utf-8").write(
@@ -429,22 +442,57 @@ def finalize():
         % len(urls))
 
 
+
+def fingerprint():
+    """Pune amprenta continutului in numele fisierelor CSS si JS.
+
+    `_headers` tine CSS-ul si JS-ul in cache o saptamana, dar numele nu se
+    schimbau niciodata de la un build la altul. Dupa o publicare, browserul
+    lua HTML nou cu CSS vechi — si pagina arata amestecat, cu jumatate din
+    culori schimbate. Cu numele legat de continut, asa ceva nu mai poate aparea.
+    """
+    renames = {}
+    for sub, names in (("css", ["site.css", "fonts.css"]),
+                       ("js", sorted(os.listdir(os.path.join(OUT, "js"))))):
+        for name in names:
+            src = os.path.join(OUT, sub, name)
+            if not os.path.isfile(src):
+                continue
+            digest = hashlib.md5(open(src, "rb").read()).hexdigest()[:8]
+            stem, ext = os.path.splitext(name)
+            new = "%s.%s%s" % (stem, digest, ext)
+            os.rename(src, os.path.join(OUT, sub, new))
+            renames["%s/%s" % (sub, name)] = "%s/%s" % (sub, new)
+
+    for fn in os.listdir(OUT):
+        if not fn.endswith(".html"):
+            continue
+        fp = os.path.join(OUT, fn)
+        doc = open(fp, encoding="utf-8").read()
+        for old, new in renames.items():
+            doc = doc.replace(old, new)
+        open(fp, "w", encoding="utf-8").write(doc)
+    log("  amprenta pe %d fisiere css/js" % len(renames))
+
+
 if __name__ == "__main__":
-    log("1/8 pregatesc dist/")
+    log("1/9 pregatesc dist/")
     prepare()
-    log("2/8 imagini")
+    log("2/9 imagini")
     collect_images()
-    log("3/8 fonturi")
+    log("3/9 fonturi")
     build_fonts()
-    log("4/8 css")
+    log("4/9 css")
     build_css()
-    log("5/8 sigla reala")
+    log("5/9 sigla reala")
     build_logo()
-    log("6/8 pagini principale")
+    log("6/9 pagini principale")
     import pages_gdh
     pages_gdh.build_pages(SRC, OUT, FILES, IMG_MAP, logo_img)
-    log("7/8 pagini interioare + deploy")
+    log("7/9 pagini interioare + deploy")
     finalize()
-    log("8/8 iconite, imagine de partajare, manifest")
+    log("8/9 iconite, imagine de partajare, manifest")
     build_brand_assets()
+    log("9/9 amprenta pe css/js, ca sa nu mai ramana cache vechi")
+    fingerprint()
     log("gata -> dist/")

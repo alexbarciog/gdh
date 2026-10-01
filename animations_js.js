@@ -109,6 +109,18 @@
     var queue = [];
     var flush = null;
 
+    function reveal(batch) {
+      batch.forEach(function (el) { el.dataset.gdhEnter = "2"; });
+      gsap.to(batch, {
+        opacity: 1,
+        yPercent: 0,
+        duration: 1.1,
+        ease: "power3.out",
+        stagger: 0.08,
+        clearProps: "transform"
+      });
+    }
+
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
@@ -120,14 +132,7 @@
         var batch = queue.slice();
         queue.length = 0;
         flush = null;
-        gsap.to(batch, {
-          opacity: 1,
-          yPercent: 0,
-          duration: 1.1,
-          ease: "power3.out",
-          stagger: 0.08,
-          clearProps: "transform"
-        });
+        reveal(batch);
       }, 60);
       // fără margine negativă: un element lipit de subsolul paginii nu ar apuca
       // niciodată să treacă de un prag decalat în sus
@@ -143,6 +148,28 @@
         io.observe(el);
       });
     });
+
+    /* Plasa de siguranta. Intrarile pleaca de la opacity 0 si se aprind doar
+     * cand observatorul le anunta. Daca anuntul nu vine — fila deschisa in
+     * fundal, o incarcare intrerupta, un element mutat de alt script — bucata
+     * aia de pagina ramane invizibila pentru totdeauna, si pare ca site-ul
+     * taie continutul. Deci verificam periodic si aprindem orice a ajuns in
+     * dreptul ecranului si inca n-a fost aprins. */
+    var guard = window.setInterval(function () {
+      var pending = $("[data-gdh-enter='1']");
+      if (!pending.length) {
+        window.clearInterval(guard);
+        return;
+      }
+      var stuck = pending.filter(function (el) {
+        var r = el.getBoundingClientRect();
+        return r.top < window.innerHeight + 200 && r.bottom > -200;
+      });
+      if (stuck.length) {
+        stuck.forEach(function (el) { io.unobserve(el); });
+        reveal(stuck);
+      }
+    }, 1200);
   }
 
   /* ------------------------------------------------------------------

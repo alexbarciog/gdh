@@ -2098,7 +2098,7 @@ textarea.g-input, textarea.g-select {
   --_spacing---space-4-medium: 4.5rem;
   --_typography---heading--heading-style-h2: 4.375rem;
   --_color---white: white;
-  --_color---primary-color: #db020d;
+  --_color---primary-color: #fe3f03;
   --_color---warm-gray: #bdb6b6;
   --_color---thunder: #2e2e2e;
   --_color---pastel-grey: #cdcdcd;
@@ -2667,7 +2667,7 @@ li {
 }
 
 .font-1-extra-small.pricing-badge {
-  color: #ffe9ea;
+  color: #ffefe6;
   line-height: var(--_typography---line-height--line-height-1-4);
   font-weight: var(--fonts-weight--semi-bold);
 }
@@ -3212,7 +3212,7 @@ li {
   align-items: center;
   transition: all .5s;
   display: flex;
-  box-shadow: 0 6px 24px #db020d80;
+  box-shadow: 0 6px 24px #fe3f0380;
 }
 
 .primary-button:where(.g-variant-41cf4b1d-6a5e-2c91-cb82-b38ac77b150e) {
@@ -8127,7 +8127,7 @@ li {
 }
 
 /* ---------- GDH brand ---------- */
-:root{--gdh-red:#db020d;--gdh-red-dark:#a80209;--gdh-ink:#111111;}
+:root{--gdh-red:#fe3f03;--gdh-red-dark:#d23403;--gdh-ink:#111111;}
 .gdh-logo{display:block;height:auto;width:auto;max-width:100%}
 .gdh-logo--nav{height:54px}
 .gdh-logo--footer{height:66px}
@@ -8206,10 +8206,11 @@ select:focus-visible,[tabindex]:focus-visible,.faq-top:focus-visible{
   .footer-link,.contact-link,.social-link,.navlink,.g-slider-dot{position:relative}
   .footer-link::after,.contact-link::after,.navlink::after{
     content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
-  /* sablonul pune max-height 1.5rem, deci nu ajunge doar height */
-  .social-link{width:44px;height:44px;max-height:44px;display:inline-flex;
-    align-items:center;justify-content:center}
-  .social-link .social-icon{width:24px;height:24px}
+  /* max-height 1.5rem nu e o scapare a sablonului, e masca: iconita e pusa de
+     doua ori, una sub alta, si se roteste la hover. Daca marim caseta, apare si
+     a doua — deci zona de atins vine dintr-un strat invizibil peste ea. */
+  .social-link::after{content:"";position:absolute;left:50%;top:50%;
+    width:44px;height:44px;transform:translate(-50%,-50%)}
   .service-slide-button,.review-slide-button{min-width:44px;min-height:44px;
     display:inline-flex;align-items:center;justify-content:center}
   .g-slider-dot{width:12px;height:12px}

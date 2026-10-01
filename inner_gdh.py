@@ -102,7 +102,7 @@ PAGES = {
              "every surface, from warehouse signage to this website.",
         body=P(
             ("Colour",
-             "GDH Red (#DB020D) is the primary colour and carries the logo, primary actions and "
+             "GDH Orange (#FE3F03) is the primary colour and carries the logo, primary actions and "
              "highlights. Ink (#111111) carries typography and the diagonal cut inside the wordmark. "
              "White is the resting surface. No other accent colour is used in brand communication."),
             ("Typography",
@@ -118,7 +118,7 @@ PAGES = {
              "Clear space around the logo equals the height of the letter G. Minimum reproduction width "
              "is 96 px on screen and 28 mm in print."),
         ),
-        swatches=[("#DB020D", "GDH Red"), ("#111111", "Ink"), ("#F5F5F5", "Surface"), ("#FFFFFF", "White")],
+        swatches=[("#FE3F03", "GDH Orange"), ("#111111", "Ink"), ("#F5F5F5", "Surface"), ("#FFFFFF", "White")],
     ),
     "licenses.html": dict(
         title="Licences & credits",

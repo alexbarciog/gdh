@@ -161,6 +161,12 @@ def rewrite_assets(doc, img_map, prefixes, remote_map):
     return doc
 
 
+def _brand():
+    """Culoarea de brand, dintr-un singur loc (build_gdh.BRAND)."""
+    import build_gdh
+    return build_gdh.BRAND
+
+
 def head_common(page, title, desc, og_type="website"):
     """Antetul comun: iconițe, manifest, canonical și cartonașul de partajare.
 
@@ -178,7 +184,7 @@ def head_common(page, title, desc, og_type="website"):
         '<link rel="icon" href="/img/icon-16.png" type="image/png" sizes="16x16">'
         '<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">'
         '<link rel="manifest" href="/site.webmanifest">'
-        '<meta name="theme-color" content="#db020d">'
+        '<meta name="theme-color" content="__BRAND__">'
         '<meta name="application-name" content="GDH">'
         '<meta name="apple-mobile-web-app-title" content="GDH">'
         '<meta name="color-scheme" content="light">'
@@ -200,7 +206,7 @@ def head_common(page, title, desc, og_type="website"):
         '<meta name="twitter:image" content="%s">'
         '<meta name="twitter:image:alt" content="%s">'
         % (url, og_type, esc(C.SITE_NAME), url, esc(title), esc(desc), img, img, esc(C.OG_ALT),
-           esc(title), esc(desc), img, esc(C.OG_ALT)))
+           esc(title), esc(desc), img, esc(C.OG_ALT))).replace("__BRAND__", _brand())
 
 
 def json_ld(page):

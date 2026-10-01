@@ -8,7 +8,7 @@ import os, io, math
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
-RED = (219, 2, 13)
+RED = (254, 63, 3)      # vezi BRAND din build_gdh.py
 INK = (17, 17, 17)
 WHITE = (255, 255, 255)
 
@@ -179,7 +179,7 @@ def build_manifest(out, name, short):
         "scope": "/",
         "display": "standalone",
         "background_color": "#0d0d0d",
-        "theme_color": "#db020d",
+        "theme_color": "#fe3f03",
         "icons": [
             {"src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png"},
             {"src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png"},
