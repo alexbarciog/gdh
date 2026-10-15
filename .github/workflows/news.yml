@@ -56,6 +56,6 @@ jobs:
             echo "Nothing new to publish."
             exit 0
           fi
-          git commit -m "Publish news ($(date -u +%Y-%m-%d))"
+          git commit -m "Publish news ($(TZ=Europe/Bucharest date +%Y-%m-%d))"
           git pull --rebase origin main
           git push origin HEAD:main
