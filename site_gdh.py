@@ -59,7 +59,7 @@ def head(page, title, desc, noindex=False, og_type="website"):
         '<link rel="icon" href="/img/icon-32.png" type="image/png" sizes="32x32">'
         '<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">'
         '<link rel="manifest" href="/site.webmanifest">'
-        '<meta name="theme-color" content="#00767a">'
+        '<meta name="theme-color" content="#000000">'
         '<meta name="color-scheme" content="light">'
         '<meta property="og:type" content="%s">'
         '<meta property="og:site_name" content="%s">'
@@ -155,36 +155,50 @@ def meta_desc(lede, sections=(), floor=70):
     return text
 
 
-def shell(page, title, desc, body, current="", noindex=False, jsonld="", og_type="website"):
+# linkurile de companie din meniul complet
+COMPANY = [
+    ("About us", "about-us.html"),
+    ("Insights", "insights.html"),
+    ("Careers", "careers.html"),
+    ("News", "news.html"),
+    ("Locations", "locations.html"),
+    ("Partner with us", "partner-with-us.html"),
+    ("Contact", "contact.html"),
+]
+
+
+def shell(page, title, desc, body, current="", noindex=False, jsonld="", og_type="website",
+          over=False):
+    """`over`: pagina incepe cu bannerul video, antetul porneste alb."""
+    contact = (C.EMAIL, C.PHONE, C.ADDRESS)
     return (
         '<!DOCTYPE html><html lang="en"><head>%s'
         '<link rel="stylesheet" href="css/site.css">%s</head><body>'
         '<a class="gdh-skip" href="#main">Skip to content</a>'
-        '%s%s%s'
+        '%s%s'
         '<main id="main" tabindex="-1">%s</main>'
         '%s<script src="js/site.js" defer></script></body></html>'
         % (head(page, title, desc, noindex, og_type), jsonld,
-           U.chrome(C.TOPBAR, C.NAV, LOGO_DARK, current), "",
-           U.drawer(C.NAV),
+           U.chrome(C.TOPBAR, C.NAV, LOGO_DARK, current, over=over),
+           U.drawer(C.NAV, COMPANY, contact, LOGO_DARK),
            body,
-           U.footer(C.FOOTER_NAV, LOGO_LIGHT, C.LEGAL)))
+           U.footer(C.FOOTER_NAV, LOGO_LIGHT, C.LEGAL, contact)))
 
 
 # ----------------------------------------------------------------- fragments
 def contact_section():
     c = C.CONTACT
     return U.section(
-        U.head_block("Contact", "Get in touch with the commercial desk.")
+        U.head_block("Contact", "Get in touch with the commercial desk.",
+                     "We read everything that arrives and reply either way.")
         + U.contact_band(c["name"], c["role"], c["blurb"], C.EMAIL, C.PHONE),
         variant="grey")
 
 
 def cta_section(title, text):
-    return U.section(
-        U.cta_band(title, text,
-                   U.btn("Partner with us", "partner-with-us.html"),
-                   U.btn("Contact sales", "contact.html", "ghost")),
-        variant="grey")
+    return U.cta_band(title, text,
+                      U.btn("Partner with us", "partner-with-us.html"),
+                      U.btn("Contact sales", "contact-sales.html", "on-dark"))
 
 
 def faq_section(items, title="Questions brands ask us."):
@@ -208,60 +222,102 @@ def simple_page(page, data, current="", trail=None, noindex=False, extra=""):
 
 
 # ---------------------------------------------------------------- home page
+# Serviciile din vitrina de pe prima pagina. Etichetele sunt luate din ce
+# promite pagina fiecarui serviciu, nu inventate.
+SERVICES = [
+    dict(title="Chain listings", href="service-chain-listings.html",
+         image="img/planning.webp",
+         text="We prepare the submission, take the meeting with the chain buyers we already "
+              "supply, and buy the opening order ourselves.",
+         tags=["Submission", "Buyer meeting", "Opening order"]),
+    dict(title="Stock & delivery", href="service-stock-and-delivery.html",
+         image="img/warehouse-racking.webp",
+         text="One delivery into our bay. From there the stock is ours: we store it and "
+              "deliver it to every depot and store, every week.",
+         tags=["Goods-in", "Storage", "Weekly delivery"]),
+    dict(title="Shelf execution", href="service-shelf-execution.html",
+         image="img/team.webp",
+         text="Field teams correct facings, rebuild displays and photograph every store "
+              "call, so the planogram holds after launch week.",
+         tags=["Facings", "Displays", "Store photos"]),
+    dict(title="Sell-out visibility", href="service-sell-out-visibility.html",
+         image="img/stock-check.webp",
+         text="Weekly rate of sale per chain and SKU, with weeks of cover and batch "
+              "records — what sold, where, and how fast.",
+         tags=["Rate of sale", "Weeks of cover", "Batch records"]),
+    dict(title="Returns & recalls", href="service-returns.html",
+         image="img/packing.webp",
+         text="Collected on the delivery round, graded at our hub, and every recall traced "
+              "back by batch.",
+         tags=["Collection", "Grading", "Recall tracing"]),
+]
+
+
 def home():
     h = C.HOME
-    hero = U.hero(h["kicker"], h["title"], h["lede"],
-                  [U.btn("Partner with us", "partner-with-us.html"),
-                   U.btn("What we do", "distribution.html", "on-dark")],
-                  image=img("index.html"))
+    hero = U.home_hero(
+        ["Your product,", "on the shelves", "that matter."],
+        "We buy, stock and sell your range into the country’s largest store chains and "
+        "dental practices.",
+        [U.btn("Partner with us", "partner-with-us.html"),
+         U.btn("What we do", "distribution.html", "on-dark")],
+        [(s["title"], s["href"]) for s in SERVICES[:4]],
+        ("img/gdh-mark.png", "Retail & dental", "Two channels, one network"),
+        ("Based in Ghiroda, Romania", "Europe/Bucharest"))
 
-    topics = U.section(
-        U.head_block("Start here", h["topics_title"]) + U.topics(h["topics"]),
-        tight=True)
+    about = U.section(
+        U.lead_say(h["lede"], "About GDH")
+        + '<div class="lead-say" style="margin-top:44px"><div></div><div>%s</div></div>'
+        % U.btn("Learn about us", "about-us.html"))
 
-    features = U.section("".join(
-        '<div class="split%s" style="margin-bottom:64px">'
-        '<div class="split__media">%s</div><div>%s<h2 class="h1">%s</h2>'
-        '<p class="muted" style="margin-top:16px">%s</p>'
-        '<div style="margin-top:24px">%s</div></div></div>'
-        % (" split--reverse" if i % 2 else "",
-           ('<img src="%s" alt="" loading="lazy" decoding="async">' % U.esc(f["image"]))
-           if f.get("image") else '<div style="background:var(--g100);aspect-ratio:4/3"></div>',
-           U.eyebrow(f["kicker"]), U.esc(f["title"]), U.esc(f["text"]),
-           U.link_arrow("Read more", f["href"]))
-        for i, f in enumerate(h["features"])), variant="grey")
-
-    sectors = U.section(
-        U.head_block("Sectors", h["sectors_title"], h["sectors_lede"])
-        + '<div class="grid grid--4">%s</div>' % "".join([
-            U.tile("Grocery", "Food and beverage into national grocery chains.",
-                   "sector-grocery.html"),
-            U.tile("Health & Beauty", "Personal care into drugstore chains and pharmacies.",
-                   "sector-health-beauty.html"),
-            U.tile("Convenience", "Small-format stores no single brand can serve alone.",
-                   "sector-convenience.html"),
-            U.tile("Dental", "Materials and consumables into practices and laboratories.",
-                   "sector-dental.html"),
-        ]))
+    # banda care curge, apoi „de unde incep” si cele doua povesti, pe gri
+    feats = "".join(
+        U.feature(f["title"], f["kicker"], f["text"], f["href"], f["image"], tag="0%d" % i)
+        for i, f in enumerate(h["features"], 1))
+    start = ('<section class="section section--grey" style="padding-top:clamp(60px,7vw,100px)">'
+             '%s<div class="wrap" data-reveal style="margin-top:clamp(50px,6vw,90px)">%s%s'
+             '<div class="features" style="margin-top:clamp(70px,8vw,120px)">%s</div>'
+             '</div></section>'
+             % (U.marquee(["Retail", "~", "Dental", "~", "Distribution", "~"]),
+                U.head_block("Start here", h["topics_title"],
+                             "Six ways brands usually begin. Pick the one closest to yours."),
+                U.topics(h["topics"]), feats))
 
     services = U.section(
         U.head_block("Distribution", h["services_title"], h["services_lede"],
                      U.link_arrow("See everything we do", "distribution.html"))
+        + U.services_showcase(SERVICES), variant="ink", cls="is-dark")
+
+    how = U.section(
+        U.head_block("How it works", "From your range to a full shelf.", center=True)
+        + U.process(
+            [("Send us your range",
+              "Product list, pack sizes, capacity. Send what you have; we fill the gaps."),
+             ("We meet the buyer",
+              "We prepare the submission and take it to buyers we already supply."),
+             ("We buy the stock",
+              "We buy the opening order, hold it and deliver to every depot and store."),
+             ("On shelf, reported",
+              "Field teams hold the planogram; you see sell-out every week.")],
+            "Need a route to market?", "It costs your brand nothing.",
+            U.btn("Send us your range", "partner-with-us.html")))
+
+    sectors = U.section(
+        U.head_block("Sectors", h["sectors_title"], h["sectors_lede"],
+                     U.link_arrow("All sectors", "sectors.html"))
         + '<div class="grid grid--4">%s</div>' % "".join([
-            U.card("Chain listings", "We take your range to the buyers we already supply.",
-                   "service-chain-listings.html", meta="01", image="img/planning.webp"),
-            U.card("Stock & delivery", "We buy the stock and supply every depot and store.",
-                   "service-stock-and-delivery.html", meta="02",
-                   image="img/warehouse-racking.webp"),
-            U.card("Shelf execution", "Our people place it, hold the planogram and report back.",
-                   "service-shelf-execution.html", meta="03", image="img/team.webp"),
-            U.card("Sell-out visibility", "What sold, where, and how fast — back to you.",
-                   "service-sell-out-visibility.html", meta="04", image="img/stock-check.webp"),
+            U.tile("Grocery", "Food and beverage into national grocery chains.",
+                   "sector-grocery.html", "/01"),
+            U.tile("Health & Beauty", "Personal care into drugstore chains and pharmacies.",
+                   "sector-health-beauty.html", "/02"),
+            U.tile("Convenience", "Small-format stores no single brand can serve alone.",
+                   "sector-convenience.html", "/03"),
+            U.tile("Dental", "Materials and consumables into practices and laboratories.",
+                   "sector-dental.html", "/04"),
         ]), variant="grey")
 
-    stats = U.section(
-        U.head_block("The network", h["stats_title"]) + U.stats(C.STATS),
-        variant="ink", tight=True)
+    stats = U.section(U.giant("The network", "in short") + U.stats(C.STATS),
+                      variant="ink", cls="is-dark")
 
     import inner_gdh as I
 
@@ -271,9 +327,9 @@ def home():
                      align_cta=U.link_arrow("All insights", "insights.html"))
         + '<div class="grid grid--3">%s</div>' % "".join(
             U.card(title, paras[0][:132].rsplit(" ", 1)[0] + "…", fn, meta="%s · %s" % (cat, date))
-            for fn, (cat, date, title, paras) in posts), variant="grey")
+            for fn, (cat, date, title, paras) in posts))
 
-    body = (hero + topics + features + sectors + services + stats
+    body = (hero + about + start + services + how + sectors + stats
             + insights + contact_section()
             + cta_section(h["cta_title"], h["cta_text"]))
     return shell("index.html",
@@ -281,7 +337,7 @@ def home():
                  "GDH buys, stocks and distributes retail and dental products into the "
                  "country's largest store chains and dental practices — at no cost to the "
                  "brands we carry.",
-                 body, current="", jsonld=org_jsonld())
+                 body, current="", jsonld=org_jsonld(), over=True)
 
 
 # ------------------------------------------------- sector / service pages
@@ -328,25 +384,23 @@ def data_page(entry, current):
         return U.two_col(items)
 
     if rhythm == 0:
-        body += U.section(U.lead_say(secs[0][1]), tight=True)
+        body += U.section(U.lead_say(secs[0][1], secs[0][0]))
         body += U.section(spread(secs[1:2]), variant="grey")
         if len(secs) > 2:
-            body += '<section class="section section--tight statement"><div class="wrap">%s</div></section>' \
-                    % U.statement(entry["kicker"], secs[2][1])
+            body += U.statement(entry["kicker"], secs[2][1])
         if len(secs) > 3:
             body += U.section(U.two_col(secs[3:]))
     elif rhythm == 1:
         body += U.section(U.steps(secs[:3]))
         if len(secs) > 3:
-            body += '<section class="section section--tight statement"><div class="wrap">%s</div></section>' \
-                    % U.statement(entry["kicker"], secs[3][1])
+            body += U.statement(entry["kicker"], secs[3][1])
         if len(secs) > 4:
             body += U.section(spread(secs[4:5], reverse=True), variant="grey")
     else:
-        body += U.section(U.lead_say(secs[0][1]), tight=True)
+        body += U.section(U.lead_say(secs[0][1], secs[0][0]))
         body += U.section(U.two_col(secs[1:3]), variant="grey")
         if len(secs) > 3:
-            body += U.section(U.prose_blocks(secs[3:4]), variant="ink", tight=True)
+            body += U.section(U.prose_blocks(secs[3:4]), variant="ink", cls="is-dark")
         if len(secs) > 4:
             body += U.section(spread(secs[4:5]))
 
@@ -402,16 +456,17 @@ def contact_page():
         '<label class="field"><span>What do you make?</span>'
         '<textarea name="Message" required placeholder="Your range, your monthly capacity, '
         'and the chains or practices you want to reach."></textarea></label>'
-        '<button class="btn btn--primary" type="submit">Send message</button>'
+        + U.submit("Send message") +
         '</form>')
     aside = (
-        '<div>%s<h2 class="h2">Office</h2>'
-        '<p class="muted" style="margin-top:12px">%s</p>'
-        '<p style="margin-top:16px"><a class="link-arrow" href="mailto:%s">%s</a></p>'
-        '<p style="margin-top:16px"><a class="link-arrow" href="tel:%s">%s</a></p></div>'
+        '<div>%s<h2 class="h1" style="font-size:var(--t-h3)">Ghiroda, Timiș.</h2>'
+        '<p class="muted" style="margin-top:20px;font-size:var(--t-large)">%s</p>'
+        '<div style="display:flex;flex-direction:column;align-items:flex-start;gap:18px;margin-top:36px">'
+        '<a class="link-arrow" href="mailto:%s">%s%s</a>'
+        '<a class="link-arrow" href="tel:%s">%s%s</a></div></div>'
         % (U.eyebrow("Where we are"), "<br>".join(U.esc(a) for a in C.ADDRESS),
-           U.esc(C.EMAIL), U.esc(C.EMAIL),
-           U.esc(C.PHONE.replace(" ", "")), U.esc(C.PHONE)))
+           U.esc(C.EMAIL), U.esc(C.EMAIL), U.HOOK,
+           U.esc(C.PHONE.replace(" ", "")), U.esc(C.PHONE), U.HOOK))
     body = (U.pagehead([("Home", "index.html"), ("Contact", "contact.html")],
                        c["kicker"], c["title"], c["lede"])
             + U.section('<div class="split" style="align-items:start">%s<div>%s</div></div>'
@@ -423,44 +478,53 @@ def contact_page():
 def style_guide():
     import theme_gdh as T
     swatches = "".join(
-        '<div><div style="height:104px;background:%s;border:1px solid var(--g100)"></div>'
-        '<p class="card__meta" style="margin-top:10px">%s</p>'
-        '<p class="muted" style="font-size:.9rem">%s</p></div>'
+        '<div><div style="height:140px;border-radius:8px;background:%s;'
+        'border:1px solid var(--line)"></div>'
+        '<p class="card__meta" style="margin-top:14px"><span class="chip">%s</span>'
+        '<span>%s</span></p></div>'
         % (T.TOKENS[k], U.esc(label), T.TOKENS[k])
-        for k, label in [("accent", "Teal"), ("accent-bright", "Teal bright"), ("ink", "Ink"),
-                         ("grey-50", "Surface"), ("white", "White")])
+        for k, label in [("black", "Black"), ("dark-two", "Dark"), ("text", "Text"),
+                         ("light-3", "Light 3"), ("light-2", "Surface"), ("white", "White")])
+    swatches += ('<div><div style="height:140px;border-radius:8px;'
+                 'background:#000 url(%s) center/cover"></div>'
+                 '<p class="card__meta" style="margin-top:14px"><span class="chip">Gradient</span>'
+                 '<span>banner video</span></p></div>' % U.POSTER)
     type_rows = "".join(
-        '<div style="border-top:1px solid var(--g100);padding:22px 0">'
-        '<p class="card__meta">%s</p><p class="%s" style="margin-top:8px">%s</p></div>'
+        '<div style="border-top:1px solid var(--line);padding:28px 0;display:grid;'
+        'grid-template-columns:minmax(120px,1fr) 4fr;gap:20px">'
+        '<p class="mono" style="font-size:12px;color:var(--text)">%s</p><p class="%s">%s</p></div>'
         % (U.esc(name), cls, U.esc(sample))
         for name, cls, sample in [
-            ("Hero", "hero-title", "Your product, on the shelves that matter."),
-            ("Heading 1", "h1", "Two channels, one network."),
-            ("Heading 2", "h2", "What we do for a brand."),
-            ("Lede", "lede", "GDH buys your product, stocks it and sells it on."),
+            ("Display / 90", "hero-title", "Your product, on the shelves that matter."),
+            ("Heading / 70", "h1", "Two channels, one network."),
+            ("Heading / 28", "h2", "What we do for a brand."),
+            ("Body / 16", "lede", "GDH buys your product, stocks it and sells it on."),
+            ("Label / mono 14", "mono", "Retail ~ Dental ~ Distribution"),
         ])
     buttons = U.btn_row(U.btn("Primary", "#"), U.btn("Ghost", "#", "ghost"))
     body = (U.pagehead([("Home", "index.html"), ("Style guide", "style-guide.html")],
                        "Style guide", "The GDH visual system.",
                        "Colour, type and the components this site is built from.")
-            + U.section(U.head_block("Colour", "Palette.")
+            + U.section(U.head_block("Colour", "Palette.",
+                                     "Black, white and three greys. Colour comes from one "
+                                     "place: the moving gradient, which rhymes with the logo.")
                         + '<div class="grid grid--4">%s</div>' % swatches)
-            + U.section(U.head_block("Type", "Roboto, four weights.") + type_rows,
+            + U.section(U.head_block("Type", "Inter Tight and IBM Plex Mono.") + type_rows,
                         variant="grey")
             + U.section(U.head_block("Components", "Buttons and links.")
-                        + buttons + '<p style="margin-top:28px">%s</p>'
+                        + buttons + '<p style="margin-top:36px">%s</p>'
                         % U.link_arrow("Arrow link", "#"))
             + U.section(U.head_block("Logo", "On light and on dark.")
                         + '<div class="grid grid--2">'
-                        '<div style="padding:44px;background:var(--g50)">'
+                        '<div style="padding:54px;background:#fff;border-radius:8px">'
                         '<img src="%s" alt="The GDH logo on a light background" style="height:64px;width:auto"></div>'
-                        '<div style="padding:44px;background:var(--ink)">'
+                        '<div style="padding:54px;background:#000;border-radius:8px">'
                         '<img src="%s" alt="The GDH logo on a dark background" style="height:64px;width:auto"></div>'
                         '</div>' % (LOGO_DARK, LOGO_LIGHT), variant="grey"))
     return shell("style-guide.html", "Style guide | GDH",
-                 "The GDH visual system: the colour palette, the Roboto type scale, the "
-                 "button and link components, and how the logo is used on light and dark "
-                 "backgrounds.", body, "")
+                 "The GDH visual system: the black-and-white palette and banner gradient, the "
+                 "Inter Tight and IBM Plex Mono type scale, the button and link components, "
+                 "and the logo on light and dark backgrounds.", body, "")
 
 
 # ------------------------------------------------------------- build it all

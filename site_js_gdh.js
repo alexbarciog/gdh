@@ -9,7 +9,7 @@
   var $ = function (sel, root) {
     return Array.prototype.slice.call((root || document).querySelectorAll(sel));
   };
-  var mqDesktop = window.matchMedia("(min-width: 1081px)");
+  var mqDesktop = window.matchMedia("(min-width: 1181px)");
 
   /* Safari sub 14 nu are addEventListener pe MediaQueryList, doar addListener.
    * Fara verificarea asta exceptia oprea tot boot()-ul, iar pagina ramanea fara
@@ -101,37 +101,72 @@
     });
   }
 
-  /* --------------------------------------------------------- meniu telefon */
+  /* --------------------------------------------------------- meniul complet */
   function initDrawer() {
     var burger = document.querySelector(".burger");
     var drawer = document.getElementById("gdh-drawer");
     if (!burger || !drawer) return;
+    var closeBtn = drawer.querySelector(".drawer__close");
 
+    function isOpen() { return drawer.classList.contains("is-open"); }
     function set(open) {
+      if (open === isOpen()) return;
       drawer.classList.toggle("is-open", open);
       burger.setAttribute("aria-expanded", open ? "true" : "false");
       document.documentElement.classList.toggle("nav-open", open);
+      if (open) {
+        var first = drawer.querySelector(".drawer__list a");
+        if (first) first.focus({ preventScroll: true });
+      } else {
+        burger.focus({ preventScroll: true });
+      }
     }
-    burger.addEventListener("click", function () {
-      set(burger.getAttribute("aria-expanded") !== "true");
-    });
+    burger.addEventListener("click", function () { set(!isOpen()); });
+    if (closeBtn) closeBtn.addEventListener("click", function () { set(false); });
     drawer.addEventListener("click", function (e) {
-      if (e.target.closest("a")) set(false);
+      // clic pe voalul din jurul panoului, sau pe o legatura din el
+      if (e.target === drawer || e.target.closest("a")) set(false);
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") set(false);
+      if (e.key === "Escape" && isOpen()) set(false);
+      // focusul ramane in panou cat timp e deschis
+      if (e.key === "Tab" && isOpen()) {
+        var f = $("a, button", drawer);
+        if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
     });
-    onDesktopChange(function (e) { if (e.matches) set(false); });
+  }
 
-    $(".drawer__top", drawer).forEach(function (top) {
-      if (top.tagName !== "BUTTON") return;
-      var panel = top.nextElementSibling;
-      top.addEventListener("click", function () {
-        var open = top.getAttribute("aria-expanded") !== "true";
-        top.setAttribute("aria-expanded", open ? "true" : "false");
-        if (panel) panel.classList.toggle("is-open", open);
-        var sign = top.querySelector(".topics__arrow");
-        if (sign) sign.textContent = open ? "–" : "+";
+  /* ------------------------------------------------- vitrina de servicii */
+  function initServices() {
+    $("[data-svc-root]").forEach(function (root) {
+      var items = $(".svc__item", root);
+      var imgs = $("[data-svc-img]", root);
+      var label = root.querySelector("[data-svc-label]");
+      function activate(i) {
+        items.forEach(function (it, k) {
+          var on = k === i;
+          it.classList.toggle("is-active", on);
+          var head = it.querySelector(".svc__head");
+          if (head) head.setAttribute("aria-expanded", on ? "true" : "false");
+        });
+        imgs.forEach(function (im, k) { im.classList.toggle("is-on", k === i); });
+        if (label) {
+          var head = items[i].querySelector(".svc__head");
+          label.textContent = ("0" + (i + 1)).slice(-2) + " " + (head ? head.textContent : "");
+        }
+      }
+      items.forEach(function (it, i) {
+        var head = it.querySelector(".svc__head");
+        if (!head) return;
+        head.addEventListener("click", function () { activate(i); });
+        head.addEventListener("focus", function () { activate(i); });
+        it.addEventListener("mouseenter", function () {
+          if (mqDesktop.matches) activate(i);
+        });
       });
     });
   }
@@ -240,9 +275,11 @@
   function initChrome() {
     var chrome = document.getElementById("gdh-chrome");
     if (!chrome) return;
+    var over = chrome.classList.contains("chrome--over");
+    var hero = document.querySelector(".hero");
+    var lastY = window.scrollY;
 
     function measure() {
-      // sertarul de telefon porneste exact sub antet, oricat ar fi de inalt
       document.documentElement.style.setProperty(
         "--chrome-h", chrome.getBoundingClientRect().height + "px");
     }
@@ -251,7 +288,14 @@
       if (ticking) return;
       ticking = true;
       window.requestAnimationFrame(function () {
-        chrome.classList.toggle("is-scrolled", window.scrollY > 24);
+        var y = window.scrollY;
+        // peste banner antetul ramane transparent; dupa el devine alb mat
+        var limit = over && hero ? hero.offsetHeight - chrome.offsetHeight : 24;
+        chrome.classList.toggle("is-scrolled", y > limit);
+        // se ascunde la coborare si revine la urcare; nu cat timp un panou e deschis
+        var down = y > lastY && y > 320;
+        if (!chrome.classList.contains("mega-open")) chrome.classList.toggle("is-hidden", down);
+        lastY = y;
         ticking = false;
       });
     }
@@ -259,12 +303,133 @@
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", measure);
+    // focusul de tastatura in antet il aduce inapoi
+    chrome.addEventListener("focusin", function () { chrome.classList.remove("is-hidden"); });
+  }
+
+  /* --------------------------------------------- titluri care urca + cuvinte */
+  function initRise() {
+    var targets = $("[data-rise]");
+    if (!targets.length) return;
+    if (!("IntersectionObserver" in window)) {
+      targets.forEach(function (el) { el.classList.add("is-risen"); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-risen");
+        io.unobserve(entry.target);
+      });
+    }, { threshold: 0.1 });
+    targets.forEach(function (el) { io.observe(el); });
+    // plasa de siguranta, ca la aparitii: nimic nu ramane ascuns
+    window.setTimeout(function () {
+      targets.forEach(function (el) {
+        if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add("is-risen");
+      });
+    }, 1500);
+  }
+
+  function initWords() {
+    var blocks = $("[data-words]");
+    if (!blocks.length) return;
+    var sets = blocks.map(function (block) {
+      // fiecare cuvant intra in propriul <span>, fara sa strice <strong>
+      var walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+      var nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach(function (node) {
+        var frag = document.createDocumentFragment();
+        node.textContent.split(/(\s+)/).forEach(function (part) {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+          var w = document.createElement("span");
+          w.className = "w";
+          w.textContent = part;
+          frag.appendChild(w);
+        });
+        node.parentNode.replaceChild(frag, node);
+      });
+      return { block: block, words: $(".w", block) };
+    });
+    var ticking = false;
+    function paint() {
+      ticking = false;
+      var vh = window.innerHeight;
+      sets.forEach(function (set) {
+        var r = set.block.getBoundingClientRect();
+        var p = (vh * 0.85 - r.top) / (r.height + vh * 0.3);
+        p = Math.max(0, Math.min(1, p));
+        var lit = Math.round(p * set.words.length);
+        set.words.forEach(function (w, i) { w.classList.toggle("is-lit", i < lit); });
+      });
+    }
+    window.addEventListener("scroll", function () {
+      if (!ticking) { ticking = true; window.requestAnimationFrame(paint); }
+    }, { passive: true });
+    window.addEventListener("resize", paint);
+    paint();
+  }
+
+  /* ------------------------------------------------------------- ceasul */
+  function initClock() {
+    var clocks = $("[data-clock]");
+    if (!clocks.length || !window.Intl) return;
+    function tick() {
+      var now = new Date();
+      clocks.forEach(function (el) {
+        var tz = el.getAttribute("data-tz") || undefined;
+        try {
+          var time = new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit",
+            hour12: true, timeZone: tz }).format(now).toUpperCase();
+          var day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short",
+            year: "numeric", timeZone: tz }).formatToParts(now);
+          var get = function (t) {
+            for (var i = 0; i < day.length; i++) if (day[i].type === t) return day[i].value;
+            return "";
+          };
+          el.innerHTML = time + '<span class="dot" aria-hidden="true"></span>'
+            + get("day") + " " + get("month") + ", " + get("year");
+          el.setAttribute("datetime", now.toISOString());
+        } catch (e) { /* fus orar necunoscut: ramane gol */ }
+      });
+    }
+    tick();
+    window.setInterval(tick, 30000);
+  }
+
+  /* ------------------------------------------------------------- video */
+  function initVideo() {
+    var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var all = $("video");
+    if (still) {
+      // miscare redusa: ramane afisul, fara redare
+      all.forEach(function (v) { v.removeAttribute("autoplay"); v.pause(); });
+      return;
+    }
+    var lazy = $("video[data-lazy-video]");
+    if (!lazy.length || !("IntersectionObserver" in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var v = entry.target;
+        if (entry.isIntersecting) {
+          v.preload = "auto";
+          var p = v.play();
+          if (p && p.catch) p.catch(function () {});
+        } else {
+          v.pause();
+        }
+      });
+    }, { rootMargin: "200px 0px" });
+    lazy.forEach(function (v) { io.observe(v); });
   }
 
   function boot() {
     // de aici incolo CSS-ul are voie sa ascunda sectiunile pentru aparitii
     document.documentElement.classList.add("js");
-    [initChrome, initMega, initDrawer, initAccordion, initReveal, initForms]
+    [initChrome, initMega, initDrawer, initServices, initAccordion, initReveal,
+     initRise, initWords, initClock, initVideo, initForms]
       .forEach(function (fn) {
         // o parte stricata nu mai duce la o pagina goala
         try { fn(); } catch (e) { if (window.console) console.error(e); }

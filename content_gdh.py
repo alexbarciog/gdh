@@ -249,9 +249,10 @@ LICENCES = dict(
          "All copy, product descriptions, service definitions and client programme summaries "
          "on this site belong to GDH — Global Distribution Holdings, © 2026. All rights "
          "reserved."),
-        ("Typeface",
-         "Roboto by Christian Robertson, released under the Apache License 2.0. The font files "
-         "are served from this domain; no font CDN is contacted when you load a page."),
+        ("Typefaces",
+         "Inter Tight by Rasmus Andersson and IBM Plex Mono by IBM, both released under the "
+         "SIL Open Font License 1.1. The font files are served from this domain; no font CDN "
+         "is contacted when you load a page."),
         ("Code",
          "The site is plain HTML, CSS and JavaScript with no third-party trackers, no "
          "analytics and no external requests of any kind. There are no bundled libraries — "

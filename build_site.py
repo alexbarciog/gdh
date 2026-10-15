@@ -21,8 +21,13 @@ SRC = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(SRC, "dist")
 CACHE = os.path.join(SRC, ".dlcache")
 
-ROBOTO_CSS = ("https://fonts.googleapis.com/css2?"
-              "family=Roboto:wght@400;500;600;700&display=swap")
+# Inter Tight tine locul lui Creato Display din referinta (acelasi grotesc
+# strans, dar sub licenta OFL); IBM Plex Mono e chiar fontul de etichete al
+# referintei. Numele de familie publice sunt ale noastre: 'GDH Sans', 'GDH Mono'.
+FONT_CSS = ("https://fonts.googleapis.com/css2?"
+            "family=Inter+Tight:wght@400;500;600;700"
+            "&family=IBM+Plex+Mono:wght@400;500&display=swap")
+FAMILIES = {"Inter Tight": ("GDH Sans", "sans"), "IBM Plex Mono": ("GDH Mono", "plexmono")}
 
 
 def log(*a):
@@ -47,31 +52,44 @@ def prepare():
 
 # --------------------------------------------------------------------- 2
 def build_fonts():
-    """Roboto, adus local. Zero cereri catre Google din pagina publicata."""
-    css = download(ROBOTO_CSS).decode("utf-8")
+    """Inter Tight si IBM Plex Mono, aduse local. Zero cereri catre Google din
+    pagina publicata."""
+    css = download(FONT_CSS).decode("utf-8")
     blocks = re.findall(r"/\*\s*([a-z-]+)\s*\*/\s*(@font-face\s*\{.*?\})", css, re.S)
-    out, files = [], {}
+    out, files, by_digest = [], {}, {}
     for subset, block in blocks:
         if subset not in ("latin", "latin-ext"):
             continue
         m = re.search(r"url\((https://[^)]+)\)", block)
-        if not m:
+        fam = re.search(r"font-family:\s*'([^']+)'", block)
+        if not m or not fam or fam.group(1) not in FAMILIES:
             continue
+        public, stem = FAMILIES[fam.group(1)]
         data = download(m.group(1))
         weight = re.search(r"font-weight:\s*(\d+)", block)
         weight = weight.group(1) if weight else "400"
-        fn = "roboto-%s-%s.woff2" % (weight, subset)
-        if fn not in files:
+        # Inter Tight vine ca font variabil: acelasi fisier pentru toate
+        # grosimile, deci il salvam o data si il refolosim. Fisierele mono nu
+        # poarta cifre in nume, ca assets_gdh.load_fonts sa nu le ia drept sans.
+        digest = hashlib.md5(data).hexdigest()
+        if digest in by_digest:
+            fn = by_digest[digest]
+        else:
+            if stem == "sans":
+                fn = "sans-%s-%s.woff2" % (weight, subset)
+            else:
+                fn = "%s-%s-%s.woff2" % (stem, "medium" if weight == "500" else "regular", subset)
             open(os.path.join(OUT, "fonts", fn), "wb").write(data)
             files[fn] = len(data)
+            by_digest[digest] = fn
         block = block.replace(m.group(0), "url(../fonts/%s)" % fn)
-        block = block.replace("font-family: 'Roboto'", "font-family: 'GDH Roboto'")
-        block = block.replace('font-family: "Roboto"', "font-family: 'GDH Roboto'")
+        block = block.replace(fam.group(0), "font-family: '%s'" % public)
         block = block.replace("font-style: normal;", "font-style: normal;\n  font-display: swap;")
         out.append(block)
     open(os.path.join(OUT, "css", "fonts.css"), "w", encoding="utf-8").write(
-        "/* Roboto - gazduit local, fara conexiuni externe */\n" + "\n".join(out) + "\n")
-    log("  fonturi Roboto: %d declaratii, %d fisiere (%d KB)"
+        "/* Inter Tight + IBM Plex Mono - gazduite local, fara conexiuni externe */\n"
+        + "\n".join(out) + "\n")
+    log("  fonturi: %d declaratii, %d fisiere (%d KB)"
         % (len(out), len(files), sum(files.values()) // 1024))
 
 
