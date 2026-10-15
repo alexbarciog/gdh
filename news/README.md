@@ -1,5 +1,7 @@
-# Posting news on gdh-group.com
+# Posting industry news on gdh-group.com
 
+**gdh-group.com/news** carries industry news for brands selling in Romania: retail and FMCG,
+store openings and new formats, market data, regulation, logistics and the dental market.
 Every file in this folder is one news item. Add a file, and about two minutes later
 it is live at **gdh-group.com/news**, on the home page, in the RSS feed and in the
 sitemaps Google reads. Nobody needs to run anything.
@@ -10,7 +12,7 @@ sitemaps Google reads. Nobody needs to run anything.
 2. Open `_template.md`, click **Copy raw file** (the copy icon).
 3. Go back to the folder, click **Add file → Create new file**.
 4. Name the file: the date, then a few words for the web address, with dashes:
-   `2026-10-16-new-hub-in-cluj.md` → published at `gdh-group.com/news/new-hub-in-cluj`
+   `2026-10-17-lidl-opens-new-depot.md` → published at `gdh-group.com/news/lidl-opens-new-depot`
 5. Paste the template, fill it in, delete the lines that start with `#` in the header.
 6. Click **Commit changes** → **Commit directly to the main branch** → **Commit changes**.
 
@@ -21,13 +23,31 @@ something in the file needs fixing (see below) and the website stays as it was.
 
 | Line | What to write |
 |---|---|
-| `title` | The headline. Up to 90 characters. Say what happened. |
+| `title` | The headline. Ideally under 55 characters (Google shows about 60), up to 90. Say what happened. |
 | `date` | Publication date, written `YYYY-MM-DD`, e.g. `2026-10-16`. |
-| `category` | One of: Company, Network, Retail, Dental, Partnerships, Press. |
+| `category` | One of: Retail, FMCG, Dental, Market data, Regulation, Logistics. |
 | `summary` | 70–160 characters. **This is the text Google, WhatsApp and LinkedIn show** — make it a full, specific sentence. |
+| `source` | **Required.** Who published the news, e.g. `Ziarul Financiar`, `Romania Insider`, `INS`. |
+| `source_url` | **Required.** The full address of the original article or release. |
 | `image` | Optional. Upload the photo to `news/images/` first, then write its file name. |
 | `image_alt` | Required when there is an image: what the photo shows, in a few words. |
 | `updated` | Optional. If you correct a published item later, the date of the change. |
+
+## The rules for industry news
+
+1. **Write it in your own words.** Never paste the source's article, even translated. Summarise
+   the facts; quote at most one short sentence, in quotation marks, naming who said it.
+   Copying is a copyright problem, and Google ranks copied text below the original anyway.
+2. **Link the source** in `source` / `source_url`. The page shows it at the top and bottom.
+3. **Quote numbers exactly** as the source published them, with the period they cover.
+   If two sources disagree, say so, or use the official one (INS, Eurostat, the company).
+4. **End with `## Why it matters for brands`**: two or three sentences of GDH's view. This is
+   what makes our page worth reading and what lets it rank — a page that only repeats
+   another site's news is treated as a copy.
+5. **Photos:** only ones GDH owns or has a licence for. Do not copy the photo from the source
+   article — it belongs to them. No photo is fine.
+6. **Good sources:** retail-FMCG.ro, Ziarul Financiar, Romania Insider, Profit.ro, Economica.net,
+   INS (insse.ro), Eurostat, Dental Tribune, company press releases.
 
 ## Writing the text
 

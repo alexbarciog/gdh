@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
-"""Stirile GDH: un fisier Markdown pe stire, in folderul news/.
+"""Stirile din industrie (retail, FMCG, distributie, stomatologie), pe gdh-group.com/news.
+
+Un fisier Markdown pe stire, in folderul news/. Fiecare stire e scrisa de GDH
+cu cuvintele noastre si trimite la sursa originala — nu copiem articolele
+altora.
 
 Fiecare fisier incepe cu un antet intre doua randuri `---`, apoi textul:
 
     ---
     title: Chilled storage extended at the Ghiroda hub
     date: 2026-10-16
-    category: Network
+    category: Retail
     summary: O fraza sau doua, 70-160 de caractere: apare in Google si la share.
+    source: Romania Insider               (obligatoriu: cine a publicat stirea)
+    source_url: https://...               (obligatoriu: articolul original)
     image: ghiroda-chilled.jpg        (optional, din news/images/)
     image_alt: Descrierea fotografiei (obligatoriu daca exista image)
     ---
@@ -38,7 +44,7 @@ PER_PAGE = 12
 
 TITLE_MAX = 90          # titlul afisat; in <title> se scurteaza daca trebuie
 SUMMARY_MIN, SUMMARY_MAX = 70, 160
-REQUIRED = ("title", "date", "category", "summary")
+REQUIRED = ("title", "date", "category", "summary", "source", "source_url")
 
 MONTHS = ("January February March April May June July August September October "
           "November December").split()
@@ -117,6 +123,8 @@ def validate(post):
     if post.get("summary") and not SUMMARY_MIN <= n <= SUMMARY_MAX:
         problems.append("rezumatul are %d caractere (%d-%d): e textul din Google si de la share"
                         % (n, SUMMARY_MIN, SUMMARY_MAX))
+    if post.get("source_url") and not re.match(r"^https?://[^\s/]+\.[^\s]+$", post["source_url"]):
+        problems.append("„source_url” trebuie sa fie adresa completa a articolului (https://...)")
     if post.get("image"):
         if not os.path.isfile(os.path.join(IMAGES_DIR, post["image"])):
             problems.append("imaginea %s nu exista in %s" % (post["image"], IMAGES_DIR))

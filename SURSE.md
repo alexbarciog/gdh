@@ -66,7 +66,8 @@ Nu edita direct fisierele din `dist`: se rescriu la fiecare build.
 
 ## Stirile
 
-Fiecare stire e un fisier Markdown in `news/` (ghidul complet: `news/README.md`).
+Stirile din industrie (retail, FMCG, stomatologie), cate un fisier Markdown in `news/`
+(ghidul complet: `news/README.md`). Fiecare are obligatoriu sursa si adresa ei.
 `news_gdh.py` le citeste si le verifica; `site_gdh.py` scrie lista (`news.html`,
 `news/page/N`), pagina fiecarei stiri (`news/<adresa>`), fluxul RSS
 (`news/feed.xml`) si `news-sitemap.xml` pentru Google News.

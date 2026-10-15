@@ -138,9 +138,9 @@ SEO = {
         "GDH's head office and main warehouse are at CTPark, Ghiroda, Timiș, with regional hubs "
         "that keep stock close to the stores and dental practices we serve."),
     "news.html": (
-        "News from the GDH distribution network",
-        "Announcements from GDH: changes to the distribution network, new channels and "
-        "capability, and notes on the retail and dental categories we distribute."),
+        "Retail, FMCG and dental industry news | GDH",
+        "Daily retail, FMCG and dental industry news for brands selling in Romania, "
+        "summarised by the GDH commercial desk with every source linked."),
     "changelog.html": (
         "Changelog: what is new in the GDH network",
         "What changed at GDH: extended chilled storage in Ghiroda, new hubs in Cluj and "

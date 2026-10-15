@@ -99,7 +99,7 @@ def head(page, title, desc, noindex=False, og_type="website", og_image=None,
         '<meta name="twitter:title" content="%s">'
         '<meta name="twitter:description" content="%s">'
         '<meta name="twitter:image" content="%s">'
-        '<link rel="alternate" type="application/rss+xml" title="GDH news" href="%s/news/feed.xml">'
+        '<link rel="alternate" type="application/rss+xml" title="GDH industry news" href="%s/news/feed.xml">'
         '%s'
         % (e(title), e(desc),
            '<meta name="robots" content="noindex">' if noindex else "",
@@ -389,9 +389,9 @@ def home():
 
     latest = NEWS["posts"][:3]
     news = U.section(
-        U.head_block("News", "Latest from GDH.",
-                     "Announcements from the network, posted as they happen.",
-                     U.link_arrow("All news", "news.html"))
+        U.head_block("Industry news", "What moved the shelf this week.",
+                     "Retail, FMCG and dental news for brands selling in Romania, with the "
+                     "source linked.", U.link_arrow("All industry news", "news.html"))
         + '<div class="grid grid--3">%s</div>' % "".join(news_card(p) for p in latest),
         variant="grey") if latest else ""
 
@@ -555,10 +555,19 @@ def article(page, kicker, title, lede, blocks, back, trail_parent, current):
 # ------------------------------------------------------------------ stiri
 NEWS_ABOUT = [
     ("What we publish here",
-     "GDH’s own announcements, written by us and dated: changes to the network, new "
-     "channels and capability, partnerships, and notes on the retail and dental categories "
-     "we distribute. We post as things happen — most working days there is something new. "
-     "Longer analysis goes under Insights."),
+     "The industry news that matters to brands selling in Romania: retail and FMCG, "
+     "store openings and new formats, market data, regulation that changes what can be "
+     "listed, and the dental market. We pick the stories a brand owner, a chain buyer or a "
+     "practice would want to know about, and post most working days."),
+    ("How we write it",
+     "Every item is written by the GDH commercial desk in our own words and links to the "
+     "original source, named at the top and the bottom of the page. We add a short note on "
+     "what the news means for brands. We do not copy other publications’ articles, and the "
+     "figures we quote are the ones the source published."),
+    ("Corrections",
+     "If we have got something wrong, write to office@gdh-group.com with “Correction” in the "
+     "subject line. We fix errors on the page itself and show the date of the update, rather "
+     "than quietly changing the text."),
     ("Follow the news",
      "Every item is also published in our RSS feed at gdh-group.com/news/feed.xml, which any "
      "feed reader can follow. There is no sign-up, no newsletter and no tracking: the site "
@@ -612,12 +621,7 @@ def pager(page_no, pages_total):
 def news_index(posts, page_no, pages_total):
     """O pagina din lista de stiri (12 pe pagina). Prima are stirea cea mai noua mare."""
     import news_gdh as N
-    import legal_data_gdh
-    data = [e for e in legal_data_gdh.PAGES if e["slug"] == "news"][0]
-    keep = dict(data["sections"])
-    about = NEWS_ABOUT + [(h, keep[h]) for h in
-                          ("Press enquiries", "What we will and will not comment on",
-                           "Using our material") if h in keep]
+    about = NEWS_ABOUT
     page = "news.html" if page_no == 1 else "news/page/%d.html" % page_no
     chunk = posts[(page_no - 1) * N.PER_PAGE: page_no * N.PER_PAGE]
     trail = [("Home", "index.html"), ("News", "news.html")]
@@ -625,8 +629,8 @@ def news_index(posts, page_no, pages_total):
         trail.append(("Page %d" % page_no, page))
 
     if not posts:
-        listing = ('<div class="card card--text" style="min-height:0"><p class="h3">The first news '
-                   'item is on its way.</p><p class="muted">Check back soon, or follow the RSS '
+        listing = ('<div class="card card--text" style="min-height:0"><p class="h3">The first '
+                   'industry news is on its way.</p><p class="muted">Check back soon, or follow the RSS '
                    'feed.</p></div>')
     elif page_no == 1:
         listing = news_lead(chunk[0]) + (
@@ -635,17 +639,17 @@ def news_index(posts, page_no, pages_total):
     else:
         listing = '<div class="grid grid--3">%s</div>' % "".join(news_card(p) for p in chunk)
 
-    body = (U.pagehead(trail, "News", "News from GDH.",
-                       "Announcements from the GDH network: new channels and capability, "
-                       "partnerships and notes on the retail and dental categories we "
-                       "distribute — dated, and written by us.",
+    body = (U.pagehead(trail, "Industry news", "The news that moves the shelf.",
+                       "Retail, FMCG and dental industry news for brands selling in Romania — "
+                       "summarised every working day by the GDH commercial desk, with the "
+                       "source linked and a note on what it means for you.",
                        figure="(%02d)" % len(posts))
             + U.section(listing + pager(page_no, pages_total), tight=True))
     if page_no == 1:
         index = [(h, "#" + U.slug(h)) for h, _b in about]
         card = (U.card_tags("About this page", index)
-                + '<div><p class="dcard__label" style="color:var(--text)">Press</p>'
-                  '<a class="dcard__mail" href="mailto:%s?subject=Press">%s</a></div>'
+                + '<div><p class="dcard__label" style="color:var(--text)">News tip or correction</p>'
+                  '<a class="dcard__mail" href="mailto:%s?subject=News">%s</a></div>'
                   % (U.esc(C.EMAIL), U.esc(C.EMAIL)))
         body += U.section(U.head_block("About", "How we publish.") + U.detail(card, U.drows(about)),
                           variant="grey")
@@ -655,12 +659,12 @@ def news_index(posts, page_no, pages_total):
     if page_no == 1:
         title, desc = None, None          # din seo_gdh.py
     else:
-        title = "News from GDH — page %d" % page_no
-        desc = ("Older announcements from GDH, page %d: network changes, new channels, "
-                "partnerships and notes on the retail and dental categories." % page_no)
+        title = "Industry news — page %d | GDH" % page_no
+        desc = ("Earlier retail, FMCG and dental industry news for brands selling in Romania, "
+                "page %d, summarised by GDH with every source linked." % page_no)
     jsonld = json_ld({
         "@context": "https://schema.org", "@type": "CollectionPage",
-        "name": "News from GDH", "url": canonical(page),
+        "name": "Retail and dental industry news", "url": canonical(page),
         "hasPart": [{"@type": "NewsArticle", "headline": p["title"],
                      "url": canonical(news_url(p)), "datePublished": N.iso(p["date"])}
                     for p in chunk]})
@@ -698,7 +702,8 @@ def news_article(post, posts):
     older = posts[i + 1] if i + 1 < len(posts) else None
     more = [p for p in posts if p is not post][:3]
 
-    rows = [("Category", post["category"]), ("Published", N.human_date(post["date"]))]
+    rows = [("Category", post["category"]), ("Source", post["source"]),
+            ("Published", N.human_date(post["date"]))]
     if post.get("updated") and post["updated"] != post["date"]:
         rows.append(("Updated", N.human_date(post["updated"])))
     rows.append(("Reading time", "%d min" % post["minutes"]))
@@ -714,8 +719,11 @@ def news_article(post, posts):
         steps.append('<a class="newsnav__item newsnav__item--next" href="%s" rel="next">'
                      '<span class="mono">Next</span><span>%s</span></a>'
                      % (U.esc(news_url(newer)), U.esc(newer["title"])))
-    main = ('<div class="article news-body">%s</div>%s'
-            % (N.markdown(post["body"]),
+    source = ('<p class="news-source"><span class="mono">Source</span>'
+              '<a href="%s" target="_blank" rel="noopener">%s%s</a></p>'
+              % (U.esc(post["source_url"]), U.esc(post["source"]), U.ARROW))
+    main = ('<div class="article news-body">%s%s</div>%s'
+            % (N.markdown(post["body"]), source,
                ('<nav class="newsnav" aria-label="More news">%s</nav>' % "".join(steps)) if steps else ""))
 
     body = (U.pagehead([("Home", "index.html"), ("News", "news.html"), (clip(post["title"]), page)],
@@ -724,7 +732,7 @@ def news_article(post, posts):
                        figure="%02d.%02d" % (post["date"].day, post["date"].month))
             + U.section(U.detail(card, main)))
     if more:
-        body += U.section(U.head_block("More news", "Also from GDH.",
+        body += U.section(U.head_block("More news", "Also in the industry.",
                                        align_cta=U.link_arrow("All news", "news.html"))
                           + '<div class="grid grid--3">%s</div>' % "".join(news_card(p) for p in more),
                           variant="grey")
@@ -742,6 +750,7 @@ def news_article(post, posts):
         "headline": post["title"][:110], "description": post["summary"],
         "datePublished": N.iso(post["date"]), "dateModified": N.iso(modified),
         "articleSection": post["category"], "wordCount": post["words"],
+        "isBasedOn": post["source_url"],
         "image": [image], "url": url, "mainEntityOfPage": {"@type": "WebPage", "@id": url},
         "author": {"@type": "Organization", "name": C.SITE_NAME, "url": C.SITE_URL + "/"},
         "publisher": {"@type": "Organization", "name": C.SITE_NAME,
@@ -1049,9 +1058,9 @@ def deploy_files(out, pages):
                         x(p["summary"])))
     feed = ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>'
-            '<title>GDH news</title><link>%s</link>'
+            '<title>GDH industry news</title><link>%s</link>'
             '<atom:link href="%s/news/feed.xml" rel="self" type="application/rss+xml"/>'
-            '<description>Announcements from GDH — Global Distribution Holdings.</description>'
+            '<description>Retail, FMCG and dental industry news for brands selling in Romania, summarised by GDH.</description>'
             '<language>en</language>%s%s</channel></rss>\n'
             % (x(canonical("news.html")), x(C.SITE_URL),
                ("<lastBuildDate>%s</lastBuildDate>" % N.rfc822(posts[0]["date"])) if posts else "",
