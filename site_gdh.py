@@ -216,15 +216,18 @@ def write_card():
             '<a class="dcard__mail" href="mailto:%s">%s</a></div>' % (U.esc(C.EMAIL), U.esc(C.EMAIL)))
 
 
-def simple_page(page, data, current="", trail=None, noindex=False, extra=""):
+def simple_page(page, data, current="", trail=None, noindex=False, extra="", lead="",
+                buttons=()):
     """Pagina de text, pe structura paginii de detaliu: cuprinsul lipit in
-    stanga, randurile titlu / text in dreapta."""
+    stanga, randurile titlu / text in dreapta. `lead` intra imediat sub banner
+    (formularul de pe Contact sales), `extra` dupa text."""
     trail = trail or [("Home", "index.html"), (data["kicker"], page)]
     secs = [(h, b) for h, b in data["sections"]]
     index = [(h, "#" + U.slug(h)) for h, _b in secs if h]
     card = U.card_tags("On this page", index) + write_card()
-    body = (U.pagehead(trail, data["kicker"], data["title"], data["lede"],
+    body = (U.pagehead(trail, data["kicker"], data["title"], data["lede"], buttons,
                        image=img(page), figure="©26")
+            + lead
             + U.section(U.detail(card, U.drows(secs)))
             + extra
             + cta_section("Send us your range.",
@@ -466,18 +469,59 @@ def article(page, kicker, title, lede, blocks, back, trail_parent, current):
                  body, current, og_type="article")
 
 
+# ------------------------------------------------------------- formulare
+def _person_fields():
+    return ('<div class="grid grid--2">'
+            '<label class="field"><span>Name</span><input name="Name" autocomplete="name" required></label>'
+            '<label class="field"><span>Company</span><input name="Company" autocomplete="organization" required></label>'
+            '<label class="field"><span>Email</span><input name="Email" type="email" autocomplete="email" required></label>'
+            '<label class="field"><span>Phone</span><input name="Phone" type="tel" autocomplete="tel"></label>'
+            '</div>')
+
+
+def sales_form_section():
+    """Formularul de pe Contact sales: cere exact ce cere pagina — gama,
+    capacitatea lunara, canalul — si spune ce urmeaza."""
+    form = (
+        '<form data-gdh-form="1" data-subject="Sales enquiry — new range" '
+        'method="post" action="contact-sales.html">'
+        + _person_fields() +
+        '<div class="grid grid--2">'
+        '<label class="field"><span>Channel</span><select name="Channel">'
+        '<option>Retail chains</option><option>Dental practices &amp; laboratories</option>'
+        '<option>Both</option><option>Not sure yet</option></select></label>'
+        '<label class="field"><span>Monthly capacity</span>'
+        '<input name="Monthly capacity" placeholder="e.g. 4,000 cases"></label>'
+        '</div>'
+        '<label class="field"><span>Your range</span>'
+        '<textarea name="Range" required placeholder="Product list with pack sizes, shelf life, '
+        'and any listings or certifications you already hold. Send what you have — gaps are '
+        'fine."></textarea></label>'
+        + U.submit("Send your range") +
+        '</form>')
+    aside = (
+        '<div>%s<h2 class="h1" style="font-size:var(--t-h3)">Start with one message.</h2>'
+        '<p class="muted" style="margin-top:20px;font-size:var(--t-large);max-width:40ch">'
+        'Tell us what you make and what you can supply each month. A first reply usually '
+        'arrives within two working days, from a person, not an autoresponder.</p>'
+        '<p style="margin-top:20px;font-weight:600">It costs you nothing, at any stage.</p>'
+        '<div style="display:flex;flex-direction:column;align-items:flex-start;gap:18px;margin-top:36px">'
+        '<a class="link-arrow" href="mailto:%s">%s%s</a>'
+        '<a class="link-arrow" href="tel:%s">%s%s</a></div></div>'
+        % (U.eyebrow("Send your range"), U.esc(C.EMAIL), U.esc(C.EMAIL), U.HOOK,
+           U.esc(C.PHONE.replace(" ", "")), U.esc(C.PHONE), U.HOOK))
+    return ('<section class="section section--grey" id="sales-form"><div class="wrap">'
+            '<div class="split" style="align-items:start">%s'
+            '<div class="form-card">%s</div></div></div></section>' % (aside, form))
+
+
 # ------------------------------------------------------------- contact page
 def contact_page():
     c = C.CONTACT
     form = (
         '<form data-gdh-form="1" data-subject="Distribution enquiry" '
         'method="post" action="contact.html">'
-        '<div class="grid grid--2">'
-        '<label class="field"><span>Name</span><input name="Name" required></label>'
-        '<label class="field"><span>Company</span><input name="Company" required></label>'
-        '<label class="field"><span>Email</span><input name="Email" type="email" required></label>'
-        '<label class="field"><span>Phone</span><input name="Phone"></label>'
-        '</div>'
+        + _person_fields() +
         '<label class="field"><span>What do you make?</span>'
         '<textarea name="Message" required placeholder="Your range, your monthly capacity, '
         'and the chains or practices you want to reach."></textarea></label>'
@@ -617,9 +661,12 @@ def build_all(out, pages_data):
                     'company’s own registration documents, and the text should be reviewed '
                     'by a qualified adviser before it is relied upon.</p></div>',
                     tight=True, reveal=False)
+            sales = entry["slug"] == "contact-sales"
             put(name, simple_page(name, dict(
                 kicker=entry["kicker"], title=entry["title"], lede=entry["lede"],
-                sections=entry["sections"]), extra=note))
+                sections=entry["sections"]), extra=note,
+                lead=sales_form_section() if sales else "",
+                buttons=[U.btn("Send your range", "#sales-form")] if sales else ()))
     except ImportError:
         pass
 
