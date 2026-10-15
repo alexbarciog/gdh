@@ -142,7 +142,7 @@ def header(nav, logo_src, current=""):
         # aria-current, nu doar o clasa de CSS: altfel pagina curenta nu e
         # anuntata de cititoarele de ecran
         mark = ' aria-current="page"' if here else ""
-        label = '%s<sup aria-hidden="true">(%d)</sup>' % (esc(group["title"]), n)
+        label = '%s<sup aria-hidden="true">(%d)</sup>' % (_roll(group["title"]), n)
         if group.get("items"):
             links.append('<a class="%s" href="%s"%s data-mega="mega-%s" '
                          'aria-expanded="false">%s</a>%s'
@@ -264,21 +264,84 @@ def crumbs(trail):
     return '<nav class="crumbs" aria-label="Breadcrumb"><ol>%s</ol></nav>' % "".join(items)
 
 
-def pagehead(trail, kicker, title, lede, buttons=(), image=None):
-    """Bannerul paginilor interioare, pe alb: eticheta, titlu mare in stanga,
-    descriere si butoane in dreapta, fotografia lata dedesubt."""
-    media = ('<div class="pagehead__media" data-reveal><img src="%s" alt="" loading="eager" '
+def pagehead(trail, kicker, title, lede, buttons=(), image=None, figure="©26"):
+    """Bannerul paginilor interioare, ca pagina de detaliu din referinta:
+    titlul mare si descrierea in stanga, o cifra uriasa in dreapta, apoi
+    fotografia lata, care se deschide la derulare."""
+    media = ('<div class="pagehead__media"><img src="%s" alt="" loading="eager" '
              'decoding="async"></div>' % esc(image)) if image else ""
-    return ('<section class="pagehead"><div class="wrap">%s'
+    fig = ('<p class="pagehead__fig" aria-hidden="true">%s</p>' % esc(figure)) if figure else ""
+    return ('<section class="pagehead"><div class="wrap">%s%s'
             '<div class="pagehead__grid">'
-            '<div class="pagehead__title">%s%s</div>'
-            '<div class="pagehead__side"><p class="lede">%s</p>%s</div>'
+            '<div class="pagehead__title">%s<p class="lede pagehead__lede">%s</p>%s</div>%s'
             '</div>%s</div></section>'
             % (crumbs(trail), eyebrow(kicker), rise(title, "h1", "h1"),
-               rich(lede), btn_row(*buttons), media))
+               rich(lede), btn_row(*buttons), fig, media))
 
 
-def section(inner, variant="", tight=False, reveal=True, cls=""):
+def slug(text):
+    import re
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:60]
+
+
+# ---------------------------------------------------------------- detail page
+def detail(card, main):
+    """Corpul paginii de detaliu: cardul gri lipit in stanga, continutul in dreapta."""
+    return ('<div class="detail"><aside class="dcard">%s</aside>'
+            '<div class="detail__main">%s</div></div>' % (card, main))
+
+
+def card_tags(label, tags):
+    """Partea de sus a cardului: eticheta intre paranteze drepte si etichetele.
+    `tags` sunt texte simple sau perechi (text, legatura)."""
+    out = []
+    for t in tags:
+        if isinstance(t, (tuple, list)):
+            out.append('<a href="%s"># %s</a>' % (esc(t[1]), esc(t[0])))
+        else:
+            out.append("<span># %s</span>" % esc(t))
+    return ('<div><p class="dcard__label">[ %s ]</p><div class="dcard__tags">%s</div></div>'
+            % (esc(label), "".join(out)))
+
+
+def card_info(rows):
+    """Randuri eticheta / valoare, pentru articole."""
+    return '<dl class="dinfo">%s</dl>' % "".join(
+        '<div><dt>%s</dt><dd>%s</dd></div>' % (esc(k), esc(v)) for k, v in rows)
+
+
+def count_figure(to, frm, label, prefix="", suffix=""):
+    """Cifra mare care numara pana la valoarea ei cand ajunge pe ecran.
+    In HTML sta valoarea finala, deci fara JavaScript se vede corect."""
+    return ('<div class="dcount"><p class="count" data-count-to="%s" data-count-from="%s" '
+            'data-prefix="%s" data-suffix="%s">%s%s%s</p><p class="dcard__label">%s</p></div>'
+            % (to, frm, esc(prefix), esc(suffix), esc(prefix), to, esc(suffix), esc(label)))
+
+
+def drows(items):
+    """Randurile de continut: titlul in stanga, textul in dreapta, cu ancora."""
+    return '<div class="drows">%s</div>' % "".join(
+        '<div id="%s"><h2 class="h2">%s</h2><p class="muted">%s</p></div>'
+        % (slug(h), esc(h), rich(b)) for h, b in items)
+
+
+def pcards(items):
+    """Fisele de proces numerotate, cu bara neagra langa titlu."""
+    return '<div class="pcards">%s</div>' % "".join(
+        '<div class="pcard"><div class="pcard__top"><h3>%s</h3><span class="pcard__n">/%03d</span>'
+        '</div><p>%s</p></div>' % (esc(it["title"]), i, esc(it["text"]))
+        for i, it in enumerate(items, 1))
+
+
+def duo(images):
+    """Doua imagini alaturate, la finalul continutului."""
+    return '<div class="duo">%s</div>' % "".join(
+        '<div class="duo__img"><img src="%s" alt="" loading="lazy" decoding="async"></div>'
+        % esc(i) for i in images)
+
+
+def section(inner, variant="", tight=False, reveal=False, cls=""):
+    # intrarile se fac pe componente (site.js), nu pe sectiunea intreaga
     classes = "section"
     if tight:
         classes += " section--tight"
@@ -447,7 +510,7 @@ def contact_band(name, role, text, email, phone):
 
 def cta_band(title, text, primary, secondary=None, kicker="Ready to start"):
     """Blocul de final: degradeul in miscare intr-o cutie rotunjita."""
-    return ('<section class="cta is-dark" data-reveal><div class="cta__box">%s'
+    return ('<section class="cta is-dark"><div class="cta__box">%s'
             '<div class="cta__inner"><div class="cta__copy">%s'
             '<h2 class="cta__title">%s</h2><p class="cta__text">%s</p>%s</div>'
             '<span class="cta__year">©2026</span></div></div></section>'
@@ -474,7 +537,7 @@ def steps(items):
 
 def statement(kicker, text):
     """O singura fraza, mare, pe degradeul din banner."""
-    return ('<section class="statement is-dark" data-reveal><div class="wrap">'
+    return ('<section class="statement is-dark"><div class="wrap">'
             '<div class="statement__box">%s<p class="statement__text">%s</p></div></div></section>'
             % (eyebrow(kicker), rich(text)))
 

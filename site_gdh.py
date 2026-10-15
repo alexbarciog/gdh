@@ -208,12 +208,22 @@ def faq_section(items, title="Questions brands ask us."):
                      + U.accordion([(i["q"], i["a"]) for i in items]))
 
 
+def write_card():
+    """Partea de jos a cardului lipit, pe paginile de text: adresa de scris."""
+    return ('<div><p class="dcard__label" style="color:var(--text)">Write to us</p>'
+            '<a class="dcard__mail" href="mailto:%s">%s</a></div>' % (U.esc(C.EMAIL), U.esc(C.EMAIL)))
+
+
 def simple_page(page, data, current="", trail=None, noindex=False, extra=""):
-    """Pagina de text: antet inchis, sectiuni de proza, indemn."""
+    """Pagina de text, pe structura paginii de detaliu: cuprinsul lipit in
+    stanga, randurile titlu / text in dreapta."""
     trail = trail or [("Home", "index.html"), (data["kicker"], page)]
+    secs = [(h, b) for h, b in data["sections"]]
+    index = [(h, "#" + U.slug(h)) for h, _b in secs if h]
+    card = U.card_tags("On this page", index) + write_card()
     body = (U.pagehead(trail, data["kicker"], data["title"], data["lede"],
-                       image=img(page))
-            + U.section(U.prose_blocks(data["sections"]))
+                       image=img(page), figure="©26")
+            + U.section(U.detail(card, U.drows(secs)))
             + extra
             + cta_section("Send us your range.",
                           "Tell us what you make and which shelves it belongs on."))
@@ -275,7 +285,7 @@ def home():
         U.feature(f["title"], f["kicker"], f["text"], f["href"], f["image"], tag="0%d" % i)
         for i, f in enumerate(h["features"], 1))
     start = ('<section class="section section--grey" style="padding-top:clamp(60px,7vw,100px)">'
-             '%s<div class="wrap" data-reveal style="margin-top:clamp(50px,6vw,90px)">%s%s'
+             '%s<div class="wrap" style="margin-top:clamp(50px,6vw,90px)">%s%s'
              '<div class="features" style="margin-top:clamp(70px,8vw,120px)">%s</div>'
              '</div></section>'
              % (U.marquee(["Retail", "~", "Dental", "~", "Distribution", "~"]),
@@ -358,60 +368,65 @@ def siblings(slug, limit=3):
     return []
 
 
-def data_page(entry, current):
-    """O pagina de sector sau de serviciu.
+# a patra fisa de proces, aceeasi peste tot: e regula de baza a afacerii
+NO_INVOICE = dict(title="Nothing to pay",
+                  text="No listing fee, no storage charge, no delivery cost. We buy the stock "
+                       "and earn from the distribution margin — your brand is never invoiced.")
 
-    Continutul are aceeasi forma peste tot — sectiuni, fise, intrebari — deci
-    daca il randam mereu la fel ies pagini identice. Alegem unul din trei
-    ritmuri, dupa pozitia paginii, ca doua pagini vecine sa nu arate la fel.
-    """
+
+def position(slug_):
+    """Locul paginii in grupul ei din meniu, ca „03~09”, pentru cifra din banner."""
+    for group in C.NAV:
+        hrefs = [h for _l, h, _d in group.get("items") or []]
+        if slug_ + ".html" in hrefs:
+            return "%02d~%02d" % (hrefs.index(slug_ + ".html") + 1, len(hrefs))
+    return "©26"
+
+
+def second_image(page, shot):
+    """A doua imagine de la final: alta decat cea din banner, aleasa stabil."""
+    pool = sorted(set(IMAGES.values()) - {shot})
+    if not pool:
+        return None
+    return pool[sum(map(ord, page)) % len(pool)]
+
+
+def data_page(entry, current):
+    """O pagina de sector sau de serviciu, pe structura paginii de detaliu din
+    referinta: banner cu cifra, card lipit cu etichete si contorul de €0,
+    randuri titlu / text, fise de proces numerotate, doua imagini la final."""
     page = entry["slug"] + ".html"
     trail = [("Home", "index.html"), (entry["kicker"], page)]
     secs = [(x["heading"], x["body"]) for x in entry["sections"]]
     shot = img(page)
-    rhythm = entry.get("rhythm", 0)
 
-    body = U.pagehead(trail, entry["kicker"], entry["title"], entry["lede"],
+    head = U.pagehead(trail, entry["kicker"], entry["title"], entry["lede"],
                       [U.btn("Partner with us", "partner-with-us.html"),
-                       U.btn("Contact sales", "contact-sales.html", "on-dark")],
-                      image=shot)
+                       U.btn("Contact sales", "contact-sales.html", "ghost")],
+                      image=shot, figure=position(entry["slug"]))
 
-    def spread(items, reverse=False):
-        """Text langa fotografie; fara fotografie, proza pe doua coloane."""
-        if shot and items:
-            h, b = items[0]
-            return U.split(h, [b], image=shot, reverse=reverse)
-        return U.two_col(items)
+    bullets = list(entry.get("bullets") or [])
+    card = (U.card_tags("What you get", [b["title"] for b in bullets])
+            + U.count_figure(0, 100, "Billed to the brands we carry", prefix="€"))
+    main = U.drows(secs[:2])
+    if bullets:
+        # regula „nu platiti nimic” intra doar daca pagina nu o spune deja
+        said = any(w in (b["title"] + " " + b["text"]).lower()
+                   for b in bullets for w in ("invoice", "fee", "pay", "cost", "charge"))
+        main += U.pcards(bullets if said else bullets + [NO_INVOICE])
+    main += U.drows(secs[2:])
+    # paginile fara fotografie (raft, stomatologie) raman fara, ca si pana acum
+    if shot:
+        other = second_image(page, shot)
+        main += U.duo([shot, other] if other else [shot])
 
-    if rhythm == 0:
-        body += U.section(U.lead_say(secs[0][1], secs[0][0]))
-        body += U.section(spread(secs[1:2]), variant="grey")
-        if len(secs) > 2:
-            body += U.statement(entry["kicker"], secs[2][1])
-        if len(secs) > 3:
-            body += U.section(U.two_col(secs[3:]))
-    elif rhythm == 1:
-        body += U.section(U.steps(secs[:3]))
-        if len(secs) > 3:
-            body += U.statement(entry["kicker"], secs[3][1])
-        if len(secs) > 4:
-            body += U.section(spread(secs[4:5], reverse=True), variant="grey")
-    else:
-        body += U.section(U.lead_say(secs[0][1], secs[0][0]))
-        body += U.section(U.two_col(secs[1:3]), variant="grey")
-        if len(secs) > 3:
-            body += U.section(U.prose_blocks(secs[3:4]), variant="ink", cls="is-dark")
-        if len(secs) > 4:
-            body += U.section(spread(secs[4:5]))
-
-    if entry.get("bullets"):
-        body += U.section(U.head_block("", "In practice.") + U.facts(entry["bullets"]),
-                          variant="" if rhythm == 1 else "grey")
+    body = head + U.section(U.detail(card, main))
     body += faq_section(entry.get("faq", []))
 
     near = siblings(entry["slug"])
     if near:
-        body += U.section(U.head_block("", "Next door.") + U.related(near), tight=True)
+        body += U.section(U.head_block("Explore", "Next door.") + U.related(near),
+                          variant="grey")
 
     body += cta_section("Send us your range.",
                         "We will tell you honestly where it fits and how fast we can start.")
@@ -422,7 +437,7 @@ def data_page(entry, current):
 # ----------------------------------------------------------- listing pages
 def listing(page, kicker, title, lede, cards, current, section_title="All of them."):
     body = (U.pagehead([("Home", "index.html"), (kicker, page)], kicker, title, lede,
-                       image=img(page))
+                       image=img(page), figure="(%02d)" % len(cards))
             + U.section(U.head_block("", section_title)
                         + '<div class="grid grid--3">%s</div>' % "".join(cards))
             + cta_section("Send us your range.",
@@ -431,10 +446,18 @@ def listing(page, kicker, title, lede, cards, current, section_title="All of the
 
 
 def article(page, kicker, title, lede, blocks, back, trail_parent, current):
+    """Articol: banner, apoi fisa lipita (categorie, data, timp de citire) langa text."""
+    parts = [p.strip() for p in kicker.split("·")]
+    words = sum(len(b.split()) for _h, b in blocks) + len(lede.split())
+    info = U.card_info([("Category", parts[0]),
+                        ("Published", parts[1] if len(parts) > 1 else ""),
+                        ("Reading time", "%d min" % max(1, round(words / 200)))])
+    card = ('<div><p class="dcard__label">[ article ]</p><div style="margin-top:18px">%s</div></div>'
+            '<div>%s</div>' % (info, U.btn(back[0], back[1], "primary")))
+    day = parts[1].split()[-1][-2:] if len(parts) > 1 else "26"
     body = (U.pagehead([("Home", "index.html"), trail_parent, (clip(title), page)],
-                       kicker, title, lede, image=img(page))
-            + U.section(U.prose_blocks(blocks))
-            + U.section(U.btn_row(U.btn(back[0], back[1], "ghost")), tight=True, reveal=False)
+                       parts[0], title, lede, image=img(page), figure="©" + day)
+            + U.section(U.detail(card, U.prose_blocks(blocks)))
             + cta_section("Send us your range.",
                           "Tell us what you make and which shelves it belongs on."))
     return shell(page, page_title(title), meta_desc(lede, [("", b) for _h, b in blocks]),

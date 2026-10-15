@@ -157,6 +157,7 @@
         if (label) {
           var head = items[i].querySelector(".svc__head");
           label.textContent = ("0" + (i + 1)).slice(-2) + " " + (head ? head.textContent : "");
+          scramble(label);
         }
       }
       items.forEach(function (it, i) {
@@ -425,11 +426,276 @@
     lazy.forEach(function (v) { io.observe(v); });
   }
 
+  /* ============================================================ miscare
+   * Intrarile pe componente si efectele legate de derulare. Totul porneste de
+   * la continut vizibil: clasele care ascund se pun doar aici, doar daca
+   * utilizatorul nu a cerut miscare redusa, iar o plasa de siguranta arata
+   * orice a ramas ascuns. */
+  var REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* textul mono se „decodeaza”: literele aleatoare se aseaza pe rand */
+  var GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#/+";
+  function scramble(el) {
+    if (REDUCED || !el) return;
+    var node = null;
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      if (walker.currentNode.textContent.trim()) { node = walker.currentNode; break; }
+    }
+    if (!node) return;
+    var final = node.__final || node.textContent;
+    node.__final = final;
+    if (final.length > 48) return;
+    window.cancelAnimationFrame(node.__raf);
+    var start = null, dur = 520 + final.length * 18;
+    function frame(t) {
+      if (start === null) start = t;
+      var p = Math.min(1, (t - start) / dur);
+      var out = "";
+      for (var i = 0; i < final.length; i++) {
+        var ch = final[i];
+        if (ch === " " || i < p * final.length) out += ch;
+        else out += GLYPHS[(Math.random() * GLYPHS.length) | 0];
+      }
+      node.textContent = out;
+      if (p < 1) node.__raf = window.requestAnimationFrame(frame);
+      else node.textContent = final;
+    }
+    node.__raf = window.requestAnimationFrame(frame);
+  }
+
+  function initMotion() {
+    // panourile de meniu: indexul fiecarei intrari, pentru cascada din CSS
+    $(".drawer__panel, .mega").forEach(function (panel) {
+      $(".drawer__list li, .drawer__aside, .mega__grid li, .mega__cta", panel)
+        .forEach(function (el, i) { el.style.setProperty("--i", i); });
+    });
+    if (REDUCED || !("IntersectionObserver" in window)) return;
+
+    var UP = [".hero__list-title", ".hero__side .lede", ".hero .btn-row", ".hero__info",
+      ".pagehead__title > .eyebrow", ".pagehead__lede", ".pagehead__title .btn-row", ".crumbs",
+      ".dcard",
+      ".shead__title > .eyebrow", ".shead__side", ".lead-say__label", ".lead-say + .lead-say",
+      ".split > div:not(.split__media)", ".contact-card", ".article > p", ".prose--two > div",
+      ".statement__box", ".giant", ".marquee", ".cta__copy > .eyebrow", ".cta__text",
+      ".cta .btn-row", ".footer__info", ".footer__legal", ".mega__top"];
+    // containere: fiecare copil intra separat, in cascada
+    var STAGGER = [".hero__list", ".grid", ".stats", ".facts", ".topics", ".related", ".acc",
+      ".rows", ".steps", ".svc__list", ".footer__menus", ".features", ".process",
+      ".drows", ".pcards", ".dcard__tags", ".dinfo", ".article"];
+    var IMG = [".card__media", ".feature__media", ".split__media", ".pagehead__media",
+      ".svc__media", ".duo__img"];
+    var RISE = [".shead .h1", ".split .h1", ".cta__title", ".contact-card .h2", ".stat__value",
+      ".mega__title", ".pagehead__fig", ".count"];
+    var CODE = [".eyebrow", ".card__meta .chip", ".svc__label", ".feature__where", ".tile__num",
+      ".stat__num", ".stat__label", ".footer h3", ".hero__where span:first-child",
+      ".hero__list .n", ".step__num", ".card__tag", ".dcard__label", ".pcard__n",
+      ".dinfo dt"];
+
+    var targets = [];
+    function mark(el, cls) {
+      if (el.closest(".drawer")) return;
+      if (!el.classList.contains(cls)) { el.classList.add(cls); targets.push(el); }
+    }
+    UP.forEach(function (sel) { $(sel).forEach(function (el) { mark(el, "m-up"); }); });
+    STAGGER.forEach(function (sel) {
+      $(sel).forEach(function (box) {
+        Array.prototype.forEach.call(box.children, function (el) { mark(el, "m-up"); });
+      });
+    });
+    IMG.forEach(function (sel) { $(sel).forEach(function (el) { mark(el, "m-img"); }); });
+    RISE.forEach(function (sel) {
+      $(sel).forEach(function (el) {
+        if (el.hasAttribute("data-rise") || el.closest(".drawer")) return;
+        el.innerHTML = '<span class="rise"><span>' + el.innerHTML + "</span></span>";
+        el.setAttribute("data-rise", "");
+      });
+    });
+
+    // cele care intra pe ecran in acelasi cadru primesc intarzieri crescatoare
+    var io = new IntersectionObserver(function (entries) {
+      var batch = entries.filter(function (e) { return e.isIntersecting; })
+        .map(function (e) { return e.target; })
+        .sort(function (a, b) {
+          var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+          return (ra.top - rb.top) || (ra.left - rb.left);
+        });
+      batch.forEach(function (el, i) {
+        el.style.setProperty("--d", Math.min(i, 10) * 0.08 + "s");
+        el.classList.add("is-in");
+        io.unobserve(el);
+        $(CODE.join(","), el).forEach(scramble);
+        if (el.matches(CODE.join(","))) scramble(el);
+      });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0 });
+    targets.forEach(function (el) { io.observe(el); });
+
+    // etichetele care nu sunt in niciun element animat se decodeaza singure
+    var codeIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        codeIo.unobserve(e.target);
+        if (!e.target.closest(".m-up, .m-img")) scramble(e.target);
+      });
+    }, { threshold: 0.5 });
+    $(CODE.join(",")).forEach(function (el) { if (!el.closest(".drawer, .mega")) codeIo.observe(el); });
+
+    // cifrele care numara (€100 -> €0 pe paginile de detaliu)
+    var counts = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        counts.unobserve(e.target);
+        countUp(e.target);
+      });
+    }, { threshold: 0.6 });
+    $("[data-count-to]").forEach(function (el) {
+      var span = el.querySelector(".rise > span") || el;
+      span.textContent = (el.getAttribute("data-prefix") || "")
+        + el.getAttribute("data-count-from") + (el.getAttribute("data-suffix") || "");
+      counts.observe(el);
+    });
+
+    // crucea din „How it works”
+    var lines = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("is-in"); lines.unobserve(e.target); }
+      });
+    }, { threshold: 0.25 });
+    $(".process").forEach(function (el) { lines.observe(el); });
+
+    // legaturile mono se decodeaza la hover
+    $(".link-arrow, .svc__more, .related a, .tile").forEach(function (el) {
+      var label = el.matches(".related a") ? el.querySelector(".related__go")
+        : el.matches(".tile") ? el.querySelector(".tile__num") : el;
+      el.addEventListener("mouseenter", function () { scramble(label); });
+    });
+
+    // plasa de siguranta: nimic nu ramane ascuns daca observatorul nu anunta
+    window.setTimeout(function sweep() {
+      var left = $(".m-up:not(.is-in), .m-img:not(.is-in)");
+      left.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight && r.bottom > 0) el.classList.add("is-in");
+      });
+      if (left.length) window.setTimeout(sweep, 1500);
+    }, 2500);
+
+    initScrollFx();
+    initMagnetic();
+  }
+
+  function countUp(el) {
+    var span = el.querySelector(".rise > span") || el;
+    var from = parseFloat(el.getAttribute("data-count-from")) || 0;
+    var to = parseFloat(el.getAttribute("data-count-to")) || 0;
+    var pre = el.getAttribute("data-prefix") || "", suf = el.getAttribute("data-suffix") || "";
+    var start = null, dur = 1800;
+    function frame(t) {
+      if (start === null) start = t;
+      var p = Math.min(1, (t - start) / dur);
+      var eased = 1 - Math.pow(1 - p, 4);
+      span.textContent = pre + Math.round(from + (to - from) * eased) + suf;
+      if (p < 1) window.requestAnimationFrame(frame);
+    }
+    window.requestAnimationFrame(frame);
+  }
+
+  /* efectele legate de derulare: un singur cadru pe eveniment */
+  function initScrollFx() {
+    var hero = document.querySelector(".hero");
+    var heroFade = hero ? $(".hero__side, .hero__info", hero) : [];
+    var heroVideo = hero && hero.querySelector(".hero__media");
+    var giants = $(".giant");
+    var ctas = $(".cta__box");
+    var heads = $(".pagehead__media");
+    var para = $(".pagehead__media img, .split__media img, .feature__media img");
+    var tracks = $(".marquee__track");
+    var anims = [];
+    tracks.forEach(function (t) {
+      if (t.getAnimations) anims = anims.concat(t.getAnimations());
+    });
+
+    var lastY = window.scrollY, rate = 1, queued = false;
+    function frame() {
+      queued = false;
+      var y = window.scrollY, vh = window.innerHeight;
+      var v = y - lastY;
+      lastY = y;
+
+      // bannerul: video-ul ramane in urma (paralaxa) si se apropie; titlul nu
+      // se misca, ca sa nu-si piarda amestecul „exclusion” cu video-ul
+      if (hero && y < hero.offsetHeight + 50) {
+        var k = Math.min(1, y / hero.offsetHeight);
+        heroVideo.style.translate = y > 0 ? "0 " + (y * 0.45).toFixed(1) + "px" : "";
+        heroVideo.style.scale = y > 0 ? (1 + k * 0.14).toFixed(4) : "";
+        heroFade.forEach(function (el) {
+          el.style.opacity = y > 0 ? Math.max(0, 1 - k * 1.6).toFixed(3) : "";
+        });
+      }
+      giants.forEach(function (g) {
+        var r = g.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        var p = (r.top + r.height / 2 - vh / 2) / vh;  // -1 .. 1
+        var spans = g.children;
+        if (spans[0]) spans[0].style.translate = (p * 7).toFixed(2) + "vw 0";
+        if (spans[1]) spans[1].style.translate = (-p * 7).toFixed(2) + "vw 0";
+      });
+      ctas.forEach(function (box) {
+        var r = box.getBoundingClientRect();
+        if (r.top > vh || r.bottom < 0) return;
+        var p = Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.65)));
+        box.style.scale = (0.9 + p * 0.1).toFixed(4);
+        box.style.borderRadius = (32 - p * 24).toFixed(1) + "px";
+      });
+      heads.forEach(function (box) {
+        var r = box.getBoundingClientRect();
+        if (r.top > vh || r.bottom < 0) return;
+        var p = Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.75)));
+        box.style.scale = (0.88 + p * 0.12).toFixed(4);
+      });
+      para.forEach(function (img) {
+        var r = img.parentNode.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        var off = (r.top + r.height / 2 - vh / 2) / vh;
+        img.style.translate = "0 " + (off * -r.height * 0.09).toFixed(1) + "px";
+      });
+      // banda curge mai repede cand derulezi, si in sensul derularii
+      if (anims.length) {
+        var target = Math.max(-7, Math.min(7, 1 + v * 0.22));
+        if (v < -1) target = Math.min(-1, target);
+        rate += (target - rate) * 0.12;
+        if (Math.abs(rate) < 1 && v === 0) rate = rate < 0 ? -1 : 1;
+        anims.forEach(function (a) { a.playbackRate = rate; });
+        if (Math.abs(rate - (rate < 0 ? -1 : 1)) > 0.02) schedule();
+      }
+    }
+    function schedule() {
+      if (!queued) { queued = true; window.requestAnimationFrame(frame); }
+    }
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    schedule();
+  }
+
+  /* butoanele se apleaca usor spre cursor */
+  function initMagnetic() {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    $(".btn, .burger").forEach(function (b) {
+      b.addEventListener("mousemove", function (e) {
+        var r = b.getBoundingClientRect();
+        var dx = (e.clientX - r.left - r.width / 2) / r.width;
+        var dy = (e.clientY - r.top - r.height / 2) / r.height;
+        b.style.translate = (dx * 12).toFixed(1) + "px " + (dy * 8).toFixed(1) + "px";
+      });
+      b.addEventListener("mouseleave", function () { b.style.translate = ""; });
+    });
+  }
+
   function boot() {
     // de aici incolo CSS-ul are voie sa ascunda sectiunile pentru aparitii
     document.documentElement.classList.add("js");
     [initChrome, initMega, initDrawer, initServices, initAccordion, initReveal,
-     initRise, initWords, initClock, initVideo, initForms]
+     initMotion, initRise, initWords, initClock, initVideo, initForms]
       .forEach(function (fn) {
         // o parte stricata nu mai duce la o pagina goala
         try { fn(); } catch (e) { if (window.console) console.error(e); }
