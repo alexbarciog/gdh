@@ -38,7 +38,7 @@ Dublu-click pe `START.bat` → http://localhost:8752
 ## Reconstruire
 
 ```bash
-python3 -m pip install --user pillow fonttools
+python3 -m pip install --user pillow fonttools brotli
 python3 build_gdh.py
 ```
 

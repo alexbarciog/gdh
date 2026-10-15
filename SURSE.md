@@ -27,7 +27,7 @@ fisierele **din care se genereaza** site-ul, si site-ul gata facut (`dist/`).
 
 Are nevoie de Pillow si fontTools:
 
-    python3 -m pip install --user pillow fonttools
+    python3 -m pip install --user pillow fonttools brotli
     python3 build_gdh.py
 
 Scrie peste folderul `dist`. Fara fontTools, etapa 8 crapa **dupa** ce `dist` a
