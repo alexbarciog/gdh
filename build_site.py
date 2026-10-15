@@ -243,9 +243,11 @@ if __name__ == "__main__":
     build_logo()
     copy_images()
     log("5/7 pagini")
-    pages = S.build_all(OUT, load_pages_data())
+    pages = S.build_all(OUT, load_pages_data(), SRC)
     import seo_gdh
-    seo_gdh.check([p for p in pages if p.endswith(".html")])
+    # stirile isi au titlul si rezumatul in fisierul lor (verificate de news_gdh)
+    seo_gdh.check([p for p in pages if p.endswith(".html") and "/" not in p])
+    log("  stiri publicate: %d, programate: %d" % (len(S.NEWS["posts"]), S.NEWS["scheduled"]))
     log("  titluri si descrieri: %d, toate unice" % len(seo_gdh.SEO))
     S.deploy_files(OUT, pages)
     log("  pagini scrise: %d" % len(pages))

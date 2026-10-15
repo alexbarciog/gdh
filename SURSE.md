@@ -63,3 +63,15 @@ creare), deci numele ala trebuie folosit exact, altfel deploy-ul intra ca previe
 - **animatii** -> `animations_js.js`
 
 Nu edita direct fisierele din `dist`: se rescriu la fiecare build.
+
+## Stirile
+
+Fiecare stire e un fisier Markdown in `news/` (ghidul complet: `news/README.md`).
+`news_gdh.py` le citeste si le verifica; `site_gdh.py` scrie lista (`news.html`,
+`news/page/N`), pagina fiecarei stiri (`news/<adresa>`), fluxul RSS
+(`news/feed.xml`) si `news-sitemap.xml` pentru Google News.
+
+`.github/workflows/news.yml` reconstruieste site-ul la fiecare stire noua si in
+fiecare dimineata (pentru stirile programate), apoi trimite `dist/` pe main.
+Daca lucrezi local in acelasi timp, fa `git pull --rebase` inainte de push:
+robotul poate sa fi publicat intre timp.

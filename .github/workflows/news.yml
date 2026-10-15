@@ -1,0 +1,61 @@
+# Publica stirile din news/ fara ca cineva sa ruleze build-ul de mana.
+#
+# - la fiecare stire noua sau modificata (push in news/ pe main);
+# - in fiecare dimineata la 04:00 UTC (07:00 vara / 06:00 iarna, ora Romaniei),
+#   ca stirile programate (cu data din viitor) sa apara singure in ziua lor;
+# - la cerere, din tabul Actions -> "Publish news" -> "Run workflow".
+#
+# Reconstruieste site-ul si, daca dist/ s-a schimbat, il trimite inapoi pe main;
+# Cloudflare Pages publica apoi commit-ul, ca la orice push.
+name: Publish news
+
+on:
+  push:
+    branches: [main]
+    paths: ["news/**"]
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-news
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build dependencies
+        run: pip install pillow fonttools
+
+      # fonturile si celelalte descarcari raman intre rulari
+      - uses: actions/cache@v4
+        with:
+          path: .dlcache
+          key: dlcache-${{ hashFiles('build_site.py') }}
+          restore-keys: dlcache-
+
+      - name: Build the site
+        run: python build_site.py
+
+      - name: Publish if anything changed
+        run: |
+          git config user.name "GDH news bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A dist
+          if git diff --cached --quiet; then
+            echo "Nothing new to publish."
+            exit 0
+          fi
+          git commit -m "Publish news ($(date -u +%Y-%m-%d))"
+          git pull --rebase origin main
+          git push origin HEAD:main

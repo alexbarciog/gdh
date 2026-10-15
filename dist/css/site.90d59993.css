@@ -792,6 +792,52 @@ html.js .words .w.is-lit{color:inherit}
 .article p{font-size:var(--t-large);line-height:1.6;color:var(--text)}
 .article p + p{margin-top:26px}
 
+/* ---------- stiri ---------- */
+/* stirea cea mai noua, mare: imagine in stanga, text in dreapta */
+.news-lead{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(24px,3vw,50px);align-items:center;
+  color:var(--black)}
+.news-lead__media{position:relative;border-radius:var(--radius);overflow:hidden;background:var(--light-2)}
+.news-lead__media img,.news-lead__poster{width:100%;aspect-ratio:16/10;object-fit:cover;
+  transition:transform .8s var(--ease)}
+.news-lead__poster{background:var(--black) url(../img/banner-poster.921df6d3.webp) center/cover}
+a.news-lead:hover .news-lead__media img,a.news-lead:hover .news-lead__poster{transform:scale(1.04)}
+.news-lead__body{display:flex;flex-direction:column;align-items:flex-start;gap:20px}
+.news-lead__title{font-size:var(--t-h3);line-height:1.05;letter-spacing:-.02em}
+.news-lead .muted{font-size:var(--t-large);max-width:48ch}
+@media (max-width:860px){.news-lead{grid-template-columns:1fr}}
+
+.pager{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:clamp(50px,6vw,80px);
+  font-family:var(--mono);font-size:var(--t-label);font-weight:500;letter-spacing:-.04em;
+  text-transform:uppercase}
+.pager a,.pager span{display:inline-flex;align-items:center;justify-content:center;min-width:44px;
+  height:44px;padding:0 14px;border-radius:100px;border:1px solid var(--line-strong)}
+.pager a:hover{border-color:var(--black)}
+.pager .is-current{background:var(--black);color:#fff;border-color:var(--black)}
+
+.newsnav{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:60px;max-width:820px}
+.newsnav__item{display:flex;flex-direction:column;gap:10px;background:var(--light-2);
+  border-radius:var(--radius);padding:20px;font-weight:500;transition:background .3s}
+.newsnav__item:hover{background:var(--light-3)}
+.newsnav__item .mono{font-size:var(--t-label-s);color:var(--text)}
+.newsnav__item--next{grid-column:2;text-align:right;align-items:flex-end}
+@media (max-width:640px){.newsnav{grid-template-columns:1fr}.newsnav__item--next{grid-column:1}}
+
+/* textul stirii: subtitluri, liste, citate, legaturi */
+.news-body h2{font-size:var(--t-h5);font-weight:500;line-height:1.15;letter-spacing:-.02em;
+  margin:44px 0 16px;color:var(--black)}
+.news-body h3{font-size:var(--t-sub);font-weight:600;margin:32px 0 12px;color:var(--black)}
+.news-body h2:first-child,.news-body h3:first-child{margin-top:0}
+.news-body ul,.news-body ol{margin:20px 0;padding-left:22px;color:var(--text);
+  font-size:var(--t-large);line-height:1.6}
+.news-body ul{list-style:disc} .news-body ol{list-style:decimal}
+.news-body li + li{margin-top:8px}
+.news-body blockquote{margin:30px 0;padding:6px 0 6px 22px;border-left:4px solid var(--black)}
+.news-body blockquote p{color:var(--black);font-size:var(--t-h6);line-height:1.35}
+.news-body a{color:var(--black);text-decoration:underline;text-underline-offset:3px}
+.news-body strong{color:var(--black);font-weight:600}
+.news-body code{font-family:var(--mono);font-size:.9em;background:var(--light-2);padding:2px 6px;
+  border-radius:4px}
+
 /* fise incadrate */
 .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;counter-reset:fact}
 .fact{border:1px solid var(--line);border-radius:var(--radius);padding:24px;

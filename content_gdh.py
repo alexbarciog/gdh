@@ -57,6 +57,7 @@ NAV = [
          cta=("Partner with us", "Send us your range and we will tell you where it fits",
               "partner-with-us.html")),
     dict(key="insights", title="Insights", href="insights.html"),
+    dict(key="news", title="News", href="news.html"),
     dict(key="about", title="About us", href="about-us.html"),
 ]
 

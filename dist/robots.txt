@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
 Sitemap: https://gdh-group.com/sitemap.xml
+Sitemap: https://gdh-group.com/news-sitemap.xml
