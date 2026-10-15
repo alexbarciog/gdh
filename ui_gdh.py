@@ -264,12 +264,12 @@ def crumbs(trail):
     return '<nav class="crumbs" aria-label="Breadcrumb"><ol>%s</ol></nav>' % "".join(items)
 
 
-def pagehead(trail, kicker, title, lede, buttons=(), image=None, figure="©26"):
+def pagehead(trail, kicker, title, lede, buttons=(), image=None, figure="©26", alt=""):
     """Bannerul paginilor interioare, ca pagina de detaliu din referinta:
     titlul mare si descrierea in stanga, o cifra uriasa in dreapta, apoi
     fotografia lata, care se deschide la derulare."""
-    media = ('<div class="pagehead__media"><img src="%s" alt="" loading="eager" '
-             'decoding="async"></div>' % esc(image)) if image else ""
+    media = ('<div class="pagehead__media"><img src="%s" alt="%s" loading="eager" '
+             'decoding="async"></div>' % (esc(image), esc(alt))) if image else ""
     fig = ('<p class="pagehead__fig" aria-hidden="true">%s</p>' % esc(figure)) if figure else ""
     return ('<section class="pagehead"><div class="wrap">%s%s'
             '<div class="pagehead__grid">'
@@ -277,6 +277,12 @@ def pagehead(trail, kicker, title, lede, buttons=(), image=None, figure="©26"):
             '</div>%s</div></section>'
             % (crumbs(trail), eyebrow(kicker), rise(title, "h1", "h1"),
                rich(lede), btn_row(*buttons), fig, media))
+
+
+def wide_image(src, alt):
+    """Fotografie lata, rotunjita, care se deschide la derulare (ca in banner)."""
+    return ('<div class="pagehead__media wide-media"><img src="%s" alt="%s" loading="lazy" '
+            'decoding="async"></div>' % (esc(src), esc(alt)))
 
 
 def slug(text):

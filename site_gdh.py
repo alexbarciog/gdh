@@ -33,9 +33,10 @@ IMAGES = {
     "service-shelf-execution.html": "img/fulfilment.webp",
     "service-sell-out-visibility.html": "img/planning-desk.webp",
     "service-returns.html": "img/loading-dock.webp",
-    "about-us.html": "img/pallet-jack.webp",
-    "careers.html": "img/team.webp",
-    "locations.html": "img/warehouse-wide.webp",
+    "about-us.html": "img/gdh-warehouse-front.webp",
+    "careers.html": "img/pallet-jack.webp",
+    "locations.html": "img/gdh-warehouse-aerial.webp",
+    "contact.html": "img/gdh-warehouse-front.webp",
     "partner-with-us.html": "img/planning.webp",
 }
 
@@ -45,6 +46,20 @@ LIBRARY = ["img/automation.webp", "img/fulfilment.webp", "img/loading-dock.webp"
            "img/planning.webp", "img/planning-desk.webp", "img/sortation.webp",
            "img/stock-check.webp", "img/team.webp", "img/warehouse-racking.webp",
            "img/warehouse-wide.webp"]
+
+
+# Fotografiile cladirilor GDH arata ceva anume, deci au descriere; restul sunt
+# ilustrative si raman cu alt="" (cititoarele de ecran le sar).
+ALT = {
+    "img/gdh-warehouse-front.webp": "The GDH warehouse, with the GDH — Global Distribution "
+                                    "Holdings sign on its facade",
+    "img/gdh-warehouse-aerial.webp": "Aerial view of the GDH warehouse at dusk, with the GDH "
+                                     "logo on the wall and loading bays alongside",
+}
+
+
+def alt(src):
+    return ALT.get(src, "")
 
 
 def img(slot):
@@ -237,7 +252,7 @@ def simple_page(page, data, current="", trail=None, noindex=False, extra="", lea
     index = [(h, "#" + U.slug(h)) for h, _b in secs if h]
     card = U.card_tags("On this page", index) + write_card()
     body = (U.pagehead(trail, data["kicker"], data["title"], data["lede"], buttons,
-                       image=img(page), figure="©26")
+                       image=img(page), figure="©26", alt=alt(img(page)))
             + lead
             + U.section(U.detail(card, U.drows(secs)))
             + extra
@@ -294,7 +309,8 @@ def home():
     about = U.section(
         U.lead_say(h["lede"], "About GDH")
         + '<div class="lead-say" style="margin-top:44px"><div></div><div>%s</div></div>'
-        % U.btn("Learn about us", "about-us.html"))
+        % U.btn("Learn about us", "about-us.html")
+        + U.wide_image("img/gdh-warehouse-aerial.webp", alt("img/gdh-warehouse-aerial.webp")))
 
     # banda care curge, apoi „de unde incep” si cele doua povesti, pe gri
     feats = "".join(
@@ -580,7 +596,8 @@ def contact_page():
            U.esc(C.EMAIL), U.esc(C.EMAIL), U.HOOK,
            U.esc(C.PHONE.replace(" ", "")), U.esc(C.PHONE), U.HOOK))
     body = (U.pagehead([("Home", "index.html"), ("Contact", "contact.html")],
-                       c["kicker"], c["title"], c["lede"])
+                       c["kicker"], c["title"], c["lede"], image=img("contact.html"),
+                       alt=alt(img("contact.html")))
             + U.section('<div class="split" style="align-items:start">%s<div>%s</div></div>'
                         % (aside, form)))
     return shell("contact.html", "Contact | GDH", c["lede"], body, "")
