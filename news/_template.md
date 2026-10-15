@@ -15,8 +15,14 @@ source_url: https://the-full-address-of-the-original-article
 ---
 First paragraph: what happened, who, where, when — in your own words. Leave an empty line between paragraphs.
 
-Second paragraph: the key figures, exactly as the source published them.
+Second paragraph: the context — why it happened, what came before.
+
+## A subheading for the detail
+
+The key figures, exactly as the source published them, and the details that matter: locations, dates, sizes, what changes and for whom. Link any second source you used, like this: [Business24 reported](https://...).
 
 ## Why it matters for brands
 
-Two or three sentences from the GDH commercial desk: what this changes for a brand selling into Romanian retail or dental. This part is what makes the page worth reading.
+Three or four sentences from the GDH commercial desk: what this changes for a brand selling into Romanian retail or dental, and what to watch next. This part is what makes the page worth reading.
+
+(Whole text: 1,500 to 2,500 characters. The build rejects anything under 1,400.)

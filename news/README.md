@@ -44,6 +44,7 @@ something in the file needs fixing (see below) and the website stays as it was.
 4. **End with `## Why it matters for brands`**: two or three sentences of GDH's view. This is
    what makes our page worth reading and what lets it rank — a page that only repeats
    another site's news is treated as a copy.
+   (The full text should be 1,500–2,500 characters; see *Writing the text*.)
 5. **Photos:** only ones GDH owns or has a licence for. Do not copy the photo from the source
    article — it belongs to them. No photo is fine.
 6. **Good sources:** retail-FMCG.ro, Ziarul Financiar, Romania Insider, Profit.ro, Economica.net,
@@ -59,8 +60,11 @@ Below the second `---`, write normally. Leave an empty line between paragraphs.
 - lines starting with `-` become a bulleted list, `1.` a numbered list
 - a line starting with `>` becomes a quote
 
-The text must be at least a few sentences (200 characters). Write the most important
-fact in the first sentence — that is what people and search engines read first.
+**Length: aim for 1,500–2,500 characters** (about 250–400 words); the build rejects anything
+under 1,400. Write the most important fact in the first sentence — that is what people and
+search engines read first. A good shape: what happened (2 paragraphs), the detail and
+figures under one or two `##` subheadings, then `## Why it matters for brands`.
+Reach the length with verified detail from the source — never with filler or guesses.
 
 ## Schedule a post
 
@@ -85,7 +89,8 @@ is shared.
 
 Open the failed run → **Build the site**. The last lines say exactly which file and
 what is wrong (in Romanian, e.g. *data trebuie scrisa AAAA-LL-ZZ* = the date must be
-written YYYY-MM-DD; *rezumatul are N caractere* = the summary is too short or too long).
+written YYYY-MM-DD; *rezumatul are N caractere* = the summary is too short or too long;
+*textul are N caractere; minimul e 1400* = the article text is too short).
 Fix the file and commit again. The live site is never affected by a broken file.
 
 ## Files in this folder that are not news

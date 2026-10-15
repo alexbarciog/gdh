@@ -43,6 +43,7 @@ IMAGES_DIR = os.path.join(NEWS_DIR, "images")
 PER_PAGE = 12
 
 TITLE_MAX = 90          # titlul afisat; in <title> se scurteaza daca trebuie
+BODY_MIN = 1400         # textul stirii: tinta e 1.500-2.500 de caractere
 SUMMARY_MIN, SUMMARY_MAX = 70, 160
 REQUIRED = ("title", "date", "category", "summary", "source", "source_url")
 
@@ -132,8 +133,9 @@ def validate(post):
             problems.append("„image_alt” lipseste: descrie fotografia in cateva cuvinte")
     if not post["slug"]:
         problems.append("numele fisierului nu da o adresa valida")
-    if len(post.get("body", "")) < 200:
-        problems.append("textul are sub 200 de caractere — prea scurt ca stire")
+    if len(post.get("body", "")) < BODY_MIN:
+        problems.append("textul are %d caractere; minimul e %d (tinta: 1.500-2.500)"
+                        % (len(post.get("body", "")), BODY_MIN))
     if problems:
         raise NewsError("Stire invalida, %s:\n  - %s" % (path, "\n  - ".join(problems)))
     return post
