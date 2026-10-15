@@ -244,6 +244,9 @@ if __name__ == "__main__":
     copy_images()
     log("5/7 pagini")
     pages = S.build_all(OUT, load_pages_data())
+    import seo_gdh
+    seo_gdh.check([p for p in pages if p.endswith(".html")])
+    log("  titluri si descrieri: %d, toate unice" % len(seo_gdh.SEO))
     S.deploy_files(OUT, pages)
     log("  pagini scrise: %d" % len(pages))
     log("6/7 iconite si imagine de partajare")

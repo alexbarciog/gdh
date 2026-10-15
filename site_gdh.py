@@ -172,6 +172,11 @@ COMPANY = [
 def shell(page, title, desc, body, current="", noindex=False, jsonld="", og_type="website",
           over=False):
     """`over`: pagina incepe cu bannerul video, antetul porneste alb."""
+    # titlul si descrierea scrise de mana au intaietate: ele apar cand linkul
+    # e trimis mai departe (vezi seo_gdh.py)
+    import seo_gdh
+    if seo_gdh.get(page):
+        title, desc = seo_gdh.get(page)
     contact = (C.EMAIL, C.PHONE, C.ADDRESS)
     return (
         '<!DOCTYPE html><html lang="en"><head>%s'
