@@ -18,7 +18,9 @@ fisierele **din care se genereaza** site-ul, si site-ul gata facut (`dist/`).
 | `assets_gdh.py` | iconitele, imaginea de partajare, manifestul |
 | `site_js.js` | meniu, slidere, FAQ, formulare |
 | `animations_js.js` | animatiile pe GSAP |
-| `gdh-logo-source.png` | sigla originala, asa cum a fost primita |
+| `gdh-logo-source.png` | sigla completa (steaua + GDH), pe verticala, cu literele albe |
+| `gdh-mark-source.png` | doar steaua: favicon si iconite |
+| `img_src/og-source.png` | imaginea de partajare (link pe WhatsApp, LinkedIn etc.) |
 | `*_files/` | snapshot-ul Webflow original, materia prima |
 
 ## Cum reconstruiesc site-ul

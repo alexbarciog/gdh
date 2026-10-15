@@ -869,7 +869,7 @@ html.js .words .w.is-lit{color:inherit}
 .footer{background:var(--black);color:#fff;padding-top:100px}
 .footer__main{display:flex;justify-content:space-between;gap:40px 20px}
 .footer__info{max-width:340px;display:flex;flex-direction:column;gap:22px}
-.footer__info img{height:44px;width:auto}
+.footer__info img{height:110px;width:auto}
 .footer__info p{color:var(--w-60);line-height:1.5}
 .footer__menus{display:flex;justify-content:space-between;gap:30px;width:100%;max-width:900px}
 .footer h3{font-family:var(--mono);font-size:var(--t-label);font-weight:500;

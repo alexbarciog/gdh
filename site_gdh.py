@@ -14,6 +14,8 @@ import ui_gdh as U
 
 LOGO_DARK = "img/gdh-logo.png"        # pe fundal deschis
 LOGO_LIGHT = "img/gdh-logo-light.png"  # pe fundal inchis
+STACKED_DARK = "img/gdh-logo-stacked.png"         # sigla verticala, pe deschis
+STACKED_LIGHT = "img/gdh-logo-stacked-light.png"  # sigla verticala, pe inchis
 
 # Slot-uri de imagine: pagina -> fisier din dist/img. O pagina care nu apare
 # aici se randeaza curat, fara fotografie. Pentru raft si cabinet stomatologic
@@ -182,7 +184,7 @@ def shell(page, title, desc, body, current="", noindex=False, jsonld="", og_type
            U.chrome(C.TOPBAR, C.NAV, LOGO_DARK, current, over=over),
            U.drawer(C.NAV, COMPANY, contact, LOGO_DARK),
            body,
-           U.footer(C.FOOTER_NAV, LOGO_LIGHT, C.LEGAL, contact)))
+           U.footer(C.FOOTER_NAV, STACKED_LIGHT, C.LEGAL, contact)))
 
 
 # ----------------------------------------------------------------- fragments
@@ -513,9 +515,10 @@ def style_guide():
                  '<p class="card__meta" style="margin-top:14px"><span class="chip">Gradient</span>'
                  '<span>banner video</span></p></div>' % U.POSTER)
     type_rows = "".join(
-        '<div style="border-top:1px solid var(--line);padding:28px 0;display:grid;'
-        'grid-template-columns:minmax(120px,1fr) 4fr;gap:20px">'
-        '<p class="mono" style="font-size:12px;color:var(--text)">%s</p><p class="%s">%s</p></div>'
+        '<div style="border-top:1px solid var(--line);padding:28px 0;display:flex;'
+        'flex-wrap:wrap;gap:12px 20px">'
+        '<p class="mono" style="font-size:12px;color:var(--text);flex:0 0 160px">%s</p>'
+        '<p class="%s" style="flex:1 1 260px;min-width:0">%s</p></div>'
         % (U.esc(name), cls, U.esc(sample))
         for name, cls, sample in [
             ("Display / 90", "hero-title", "Your product, on the shelves that matter."),
@@ -543,7 +546,12 @@ def style_guide():
                         '<img src="%s" alt="The GDH logo on a light background" style="height:64px;width:auto"></div>'
                         '<div style="padding:54px;background:#000;border-radius:8px">'
                         '<img src="%s" alt="The GDH logo on a dark background" style="height:64px;width:auto"></div>'
-                        '</div>' % (LOGO_DARK, LOGO_LIGHT), variant="grey"))
+                        '<div style="padding:clamp(24px,4vw,54px);background:#fff;border-radius:8px;display:grid;place-items:center">'
+                        '<img src="%s" alt="The stacked GDH logo on a light background" style="width:min(230px,100%%);height:auto"></div>'
+                        '<div style="padding:clamp(24px,4vw,54px);background:#000;border-radius:8px;display:grid;place-items:center">'
+                        '<img src="%s" alt="The stacked GDH logo on a dark background" style="width:min(230px,100%%);height:auto"></div>'
+                        '</div>' % (LOGO_DARK, LOGO_LIGHT, STACKED_DARK, STACKED_LIGHT),
+                        variant="grey"))
     return shell("style-guide.html", "Style guide | GDH",
                  "The GDH visual system: the black-and-white palette and banner gradient, the "
                  "Inter Tight and IBM Plex Mono type scale, the button and link components, "

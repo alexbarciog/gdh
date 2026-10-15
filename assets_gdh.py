@@ -72,7 +72,12 @@ def build_icons(out, paths):
     img_dir = os.path.join(out, "img")
     mark = Image.open(os.path.join(img_dir, "gdh-mark.png")).convert("RGBA")
 
-    for px in (16, 32, 48, 96, 192, 512):
+    # favicon-urile: steaua pe transparent, ca sa se citeasca pe filele deschise
+    # si pe cele inchise; 192/512 (ecranul telefonului) pe placuta alba
+    for px in (16, 32, 48, 96):
+        LG.icon_from_mark(mark, px, pad=0.04, bg=None).save(
+            os.path.join(img_dir, "icon-%d.png" % px), optimize=True)
+    for px in (192, 512):
         LG.icon_from_mark(mark, px).save(os.path.join(img_dir, "icon-%d.png" % px), optimize=True)
 
     # apple-touch: fundal opac, iOS taie singur colțurile
@@ -87,7 +92,7 @@ def build_icons(out, paths):
     mask.paste(ic, (0, 0), ic)
     mask.save(os.path.join(img_dir, "icon-maskable-512.png"), optimize=True)
 
-    ico = LG.icon_from_mark(mark, 256)
+    ico = LG.icon_from_mark(mark, 256, pad=0.04, bg=None)
     ico.save(os.path.join(out, "favicon.ico"), sizes=[(16, 16), (32, 32), (48, 48), (64, 64)])
     return True
 

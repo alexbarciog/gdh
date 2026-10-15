@@ -126,34 +126,39 @@ def copy_images():
 
 def build_logo():
     import logo_gdh as LG
-    meta = LG.build(os.path.join(SRC, "gdh-logo-source.png"), os.path.join(OUT, "img"))
-    log("  sigla: %dx%d, marca %dx%d" % (meta["w"], meta["h"], meta["mark"][0], meta["mark"][1]))
+    meta = LG.build(os.path.join(SRC, "gdh-logo-source.png"), os.path.join(OUT, "img"),
+                    os.path.join(SRC, "gdh-mark-source.png"))
+    log("  sigla: %dx%d (raport %.3f), verticala %dx%d, steaua %dx%d"
+        % (meta["w"], meta["h"], meta["ratio"], meta["stacked"][0], meta["stacked"][1],
+           meta["mark"][0], meta["mark"][1]))
 
 
 def build_brand_assets():
     import assets_gdh as A
     fonts = A.load_fonts(OUT, os.path.join(CACHE, "ttf"))
     A.build_icons(OUT, fonts)
-    # Cartonasul de partajare: daca avem imaginea de brand in img_src, o
-    # folosim pe aia, decupata central la 1200x630. Altfel desenam una.
+    # Cartonasul de partajare: imaginea de brand din img_src/og-source.png,
+    # decupata central la 1200x630. Daca lipseste, il compunem din degradeul
+    # bannerului si sigla verticala, ca sa nu apara niciodata sigla veche.
+    from PIL import Image
+    tw, th = 1200, 630
     supplied = os.path.join(SRC, "img_src", "og-source.png")
-    if os.path.exists(supplied):
-        from PIL import Image
-        card = Image.open(supplied).convert("RGB")
-        tw, th = 1200, 630
-        scale = max(tw / card.width, th / card.height)
-        card = card.resize((round(card.width * scale), round(card.height * scale)),
-                           Image.LANCZOS)
-        left = (card.width - tw) // 2
-        top = (card.height - th) // 2
-        card.crop((left, top, left + tw, top + th)).save(
-            os.path.join(OUT, "img", "og-image.jpg"), "JPEG", quality=88, optimize=True)
-        log("  imagine de partajare: din img_src/og-source.png")
-    else:
-        A.build_og(OUT, fonts,
-                   C.HOME["title"],
-                   "Retail distribution · Dental distribution · Shelf execution",
-                   C.SITE_URL.split("//")[-1], None)
+    source = supplied if os.path.exists(supplied) else os.path.join(SRC, "img_src", "banner-poster.webp")
+    bg = Image.open(source).convert("RGB")
+    scale = max(tw / bg.width, th / bg.height)
+    bg = bg.resize((round(bg.width * scale), round(bg.height * scale)), Image.LANCZOS)
+    left, top = (bg.width - tw) // 2, (bg.height - th) // 2
+    card = bg.crop((left, top, left + tw, top + th)).convert("RGBA")
+    if source != supplied:
+        card = Image.alpha_composite(card, Image.new("RGBA", (tw, th), (0, 0, 0, 96)))
+        logo = Image.open(os.path.join(OUT, "img", "gdh-logo-stacked-light.png")).convert("RGBA")
+        lh = 330
+        logo = logo.resize((round(logo.width * lh / logo.height), lh), Image.LANCZOS)
+        card.alpha_composite(logo, ((tw - logo.width) // 2, (th - lh) // 2))
+    card.convert("RGB").save(os.path.join(OUT, "img", "og-image.jpg"), "JPEG",
+                             quality=88, optimize=True)
+    log("  imagine de partajare: %s" % ("img_src/og-source.png" if source == supplied
+                                        else "compusa din banner + sigla"))
     A.build_manifest(OUT, C.SITE_NAME, "GDH")
     log("  favicon + iconite + og-image")
 
