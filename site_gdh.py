@@ -17,28 +17,34 @@ LOGO_LIGHT = "img/gdh-logo-light.png"  # pe fundal inchis
 STACKED_DARK = "img/gdh-logo-stacked.png"         # sigla verticala, pe deschis
 STACKED_LIGHT = "img/gdh-logo-stacked-light.png"  # sigla verticala, pe inchis
 
-# Slot-uri de imagine: pagina -> fisier din dist/img. O pagina care nu apare
-# aici se randeaza curat, fara fotografie. Pentru raft si cabinet stomatologic
-# inca nu avem fotografii, deci acele pagini raman fara.
+# Fotografia din bannerul fiecarei pagini. Paginile de sector si de serviciu
+# au fiecare fotografia lor; paginile de text pot repeta una din alta sectiune.
+# O pagina care nu apare aici se randeaza curat, fara fotografie: raftul de
+# drogherie si cabinetul stomatologic inca nu au fotografii potrivite.
 IMAGES = {
-    "index.html": "img/warehouse-racking.webp",
     "sectors.html": "img/warehouse-wide.webp",
-    "sector-retail.html": "img/fulfilment.webp",
-    "sector-grocery.html": "img/packing.webp",
+    "sector-retail.html": "img/packing.webp",
+    "sector-grocery.html": "img/stock-check.webp",
     "sector-convenience.html": "img/sortation.webp",
-    "sector-private-label.html": "img/automation.webp",
-    "distribution.html": "img/sortation.webp",
-    "service-chain-listings.html": "img/planning.webp",
+    "sector-private-label.html": "img/planning.webp",
+    "distribution.html": "img/operations-floor.webp",
+    "service-chain-listings.html": "img/team.webp",
     "service-stock-and-delivery.html": "img/warehouse-racking.webp",
-    "service-shelf-execution.html": "img/team.webp",
-    "service-sell-out-visibility.html": "img/stock-check.webp",
-    "service-returns.html": "img/packing.webp",
-    "insights.html": "img/planning.webp",
-    "about-us.html": "img/team.webp",
+    "service-shelf-execution.html": "img/fulfilment.webp",
+    "service-sell-out-visibility.html": "img/planning-desk.webp",
+    "service-returns.html": "img/loading-dock.webp",
+    "about-us.html": "img/pallet-jack.webp",
     "careers.html": "img/team.webp",
     "locations.html": "img/warehouse-wide.webp",
     "partner-with-us.html": "img/planning.webp",
 }
+
+# Toate fotografiile din care se aleg perechile de la finalul paginilor.
+LIBRARY = ["img/automation.webp", "img/fulfilment.webp", "img/loading-dock.webp",
+           "img/operations-floor.webp", "img/packing.webp", "img/pallet-jack.webp",
+           "img/planning.webp", "img/planning-desk.webp", "img/sortation.webp",
+           "img/stock-check.webp", "img/team.webp", "img/warehouse-racking.webp",
+           "img/warehouse-wide.webp"]
 
 
 def img(slot):
@@ -246,17 +252,17 @@ def simple_page(page, data, current="", trail=None, noindex=False, extra="", lea
 # promite pagina fiecarui serviciu, nu inventate.
 SERVICES = [
     dict(title="Chain listings", href="service-chain-listings.html",
-         image="img/planning.webp",
+         image="img/planning-desk.webp",
          text="We prepare the submission, take the meeting with the chain buyers we already "
               "supply, and buy the opening order ourselves.",
          tags=["Submission", "Buyer meeting", "Opening order"]),
     dict(title="Stock & delivery", href="service-stock-and-delivery.html",
-         image="img/warehouse-racking.webp",
+         image="img/loading-dock.webp",
          text="One delivery into our bay. From there the stock is ours: we store it and "
               "deliver it to every depot and store, every week.",
          tags=["Goods-in", "Storage", "Weekly delivery"]),
     dict(title="Shelf execution", href="service-shelf-execution.html",
-         image="img/team.webp",
+         image="img/fulfilment.webp",
          text="Field teams correct facings, rebuild displays and photograph every store "
               "call, so the planogram holds after launch week.",
          tags=["Facings", "Displays", "Store photos"]),
@@ -266,7 +272,7 @@ SERVICES = [
               "records — what sold, where, and how fast.",
          tags=["Rate of sale", "Weeks of cover", "Batch records"]),
     dict(title="Returns & recalls", href="service-returns.html",
-         image="img/packing.webp",
+         image="img/pallet-jack.webp",
          text="Collected on the delivery round, graded at our hub, and every recall traced "
               "back by batch.",
          tags=["Collection", "Grading", "Recall tracing"]),
@@ -393,12 +399,44 @@ def position(slug_):
     return "©26"
 
 
-def second_image(page, shot):
-    """A doua imagine de la final: alta decat cea din banner, aleasa stabil."""
-    pool = sorted(set(IMAGES.values()) - {shot})
-    if not pool:
-        return None
-    return pool[sum(map(ord, page)) % len(pool)]
+_PAIRS = {}
+
+
+def closing_pair(page, shot, order):
+    """Cele doua fotografii de la finalul unei pagini de detaliu.
+
+    Se aleg o data pentru toate paginile, in ordinea meniului: niciodata
+    fotografia din bannerul paginii, mereu cele mai putin folosite pana atunci
+    pe tot site-ul (bannere, prima pagina, perechile deja date), si nicio
+    pereche nu se repeta. Asa fiecare fotografie apare de un numar apropiat de
+    ori, in loc ca aceleasi cinci sa se invarta peste tot.
+    """
+    if not _PAIRS:
+        uses = {p: 0 for p in LIBRARY}
+        for used in list(IMAGES.values()) + [x["image"] for x in SERVICES] \
+                + [f["image"] for f in C.HOME["features"]]:
+            if used in uses:
+                uses[used] += 1
+        seen = set()
+        for slug_ in order:
+            banner = IMAGES.get(slug_ + ".html")
+            if not banner:
+                continue
+            ranked = sorted((p for p in LIBRARY if p != banner),
+                            key=lambda p: (uses[p], LIBRARY.index(p)))
+            pair = None
+            for i, first in enumerate(ranked):
+                for second in ranked[i + 1:]:
+                    if frozenset((first, second)) not in seen:
+                        pair = (first, second)
+                        break
+                if pair:
+                    break
+            seen.add(frozenset(pair))
+            for x in pair:
+                uses[x] += 1
+            _PAIRS[slug_ + ".html"] = list(pair)
+    return _PAIRS.get(page, [])
 
 
 def data_page(entry, current):
@@ -427,8 +465,8 @@ def data_page(entry, current):
     main += U.drows(secs[2:])
     # paginile fara fotografie (raft, stomatologie) raman fara, ca si pana acum
     if shot:
-        other = second_image(page, shot)
-        main += U.duo([shot, other] if other else [shot])
+        import pages_data_gdh as PD
+        main += U.duo(closing_pair(page, shot, [e["slug"] for e in PD.PAGES]))
 
     body = head + U.section(U.detail(card, main))
     body += faq_section(entry.get("faq", []))

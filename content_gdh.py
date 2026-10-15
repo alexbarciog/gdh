@@ -136,7 +136,7 @@ HOME = dict(
                   "We are in those practices every week, which is a far shorter road than "
                   "building a dental sales force from scratch.",
              href="sector-dental.html",
-             image="img/stock-check.webp"),
+             image="img/operations-floor.webp"),
     ],
     sectors_title="Two channels, one network.",
     sectors_lede="Retail and dental share our warehouses and our delivery routes. Each has "
