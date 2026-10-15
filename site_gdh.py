@@ -275,7 +275,7 @@ def home():
          U.btn("What we do", "distribution.html", "on-dark")],
         [(s["title"], s["href"]) for s in SERVICES[:4]],
         ("img/gdh-mark.png", "Retail & dental", "Two channels, one network"),
-        ("Based in Ghiroda, Romania", "Europe/Bucharest"))
+        ("Based in Timișoara, Romania", "Europe/Bucharest"))
 
     about = U.section(
         U.lead_say(h["lede"], "About GDH")
@@ -484,7 +484,7 @@ def contact_page():
         + U.submit("Send message") +
         '</form>')
     aside = (
-        '<div>%s<h2 class="h1" style="font-size:var(--t-h3)">Ghiroda, Timiș.</h2>'
+        '<div>%s<h2 class="h1" style="font-size:var(--t-h3)">Timiș, Romania.</h2>'
         '<p class="muted" style="margin-top:20px;font-size:var(--t-large)">%s</p>'
         '<div style="display:flex;flex-direction:column;align-items:flex-start;gap:18px;margin-top:36px">'
         '<a class="link-arrow" href="mailto:%s">%s%s</a>'
